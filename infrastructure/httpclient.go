@@ -6,16 +6,29 @@ import (
 	"time"
 )
 
-var client = &http.Client{
-	Timeout: time.Second * 10,
-	Transport: &http.Transport{
-		DisableKeepAlives: true,
-	},
+// NewHTTPClient returns new Http client
+func NewHTTPClient() *http.Client {
+	return &http.Client{
+		Timeout: time.Second * 10,
+		Transport: &http.Transport{
+			DisableKeepAlives: true,
+		},
+	}
+}
+
+// HTTPClientInterface interface
+type HTTPClientInterface interface {
+	GetHTTPResponse(url string) []byte
+}
+
+// HTTPClientHandler struct
+type HTTPClientHandler struct {
+	Client http.Client
 }
 
 // GetHTTPResponse function
-func GetHTTPResponse(url string) []byte {
-	resp, err := client.Get(url)
+func (httpClientHandler *HTTPClientHandler) GetHTTPResponse(url string) []byte {
+	resp, err := httpClientHandler.Client.Get(url)
 	if err != nil {
 		panic(err)
 	}

@@ -1,9 +1,9 @@
-package domain
+package infrastructure
 
 import "time"
 
-// Schedule struct
-type Schedule struct {
+// ScoreAPISchedule struct
+type ScoreAPISchedule struct {
 	CurrentSeason []Group `json:"current_season"`
 	CurrentGroup  Group   `json:"current_group"`
 }
