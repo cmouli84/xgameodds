@@ -7,13 +7,17 @@ import (
 )
 
 // NewHTTPClient returns new Http client
-func NewHTTPClient() *http.Client {
-	return &http.Client{
+func NewHTTPClient() *HTTPClientHandler {
+	httpClientHandler := &HTTPClientHandler{}
+	client := http.Client{
 		Timeout: time.Second * 10,
 		Transport: &http.Transport{
 			DisableKeepAlives: true,
 		},
 	}
+	httpClientHandler.Client = client
+
+	return httpClientHandler
 }
 
 // HTTPClientInterface interface

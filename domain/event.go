@@ -10,7 +10,12 @@ type Event struct {
 	GameDate      time.Time
 	HomeTeamName  string
 	AwayTeamName  string
-	HomeOdds      float32
+	HomeOdds      float64
 	HomeTeamScore int
 	AwayTeamScore int
+}
+
+// EventsInterface interface
+type EventsInterface interface {
+	GetEventsByDate(eventDate string) []Event
 }

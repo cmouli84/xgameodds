@@ -46,7 +46,8 @@ func (handler *ScoreAPIHTTPClientHandler) GetNflEvents(eventIds []int) []ScoreAP
 		eventIDText[i] = strconv.Itoa(val)
 	}
 
-	response := handler.httpClientInterface.GetHTTPResponse(fmt.Sprintf(scoreAPIEventsURLFormat, strings.Join(eventIDText, ",")))
+	response := handler.httpClientInterface.GetHTTPResponse(
+		fmt.Sprintf(scoreAPIEventsURLFormat, strings.Join(eventIDText, ",")))
 
 	events := make([]ScoreAPIEvent, 0)
 	err := json.Unmarshal(response, &events)

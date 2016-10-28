@@ -3,6 +3,9 @@ package interfaces
 import (
 	"time"
 
+	"strconv"
+	"strings"
+
 	"github.com/cmouli84/xgameodds/domain"
 	"github.com/cmouli84/xgameodds/infrastructure"
 )
@@ -41,10 +44,33 @@ func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
 
 	events := scoreAPIRepo.scoreAPIInterface.GetEvents(eventIds)
 	filteredEvents := make([]domain.Event, 0)
+	var homeOdds float64
 	for _, event := range events {
 		eventDate, _ := time.Parse(time.RFC1123Z, event.GameDate)
+
 		if eventDate.After(parsedStartDate) && eventDate.Before(parsedEndDate) {
-			domainEvent := domain.Event{ID: event.ID, HomeTeamName: event.HomeTeam.FullName, AwayTeamName: event.AwayTeam.FullName, HomeTeamScore: event.BoxScore.Score.Home.Score, AwayTeamScore: event.BoxScore.Score.Away.Score, HomeOdds: 0 /*event.Odd.HomeOdd*/, GameDate: eventDate /*event.GameDate */}
+			homeOdds = -999999
+
+			if !strings.HasPrefix(event.Odd.HomeOdd, "pk") && !strings.HasPrefix(event.Odd.HomeOdd, "N") {
+				if strings.HasPrefix(event.Odd.HomeOdd, "T") {
+					homeOdds, _ = strconv.ParseFloat(event.Odd.AwayOdd, 64)
+					homeOdds *= -1
+				} else {
+					homeOdds, _ = strconv.ParseFloat(event.Odd.HomeOdd, 64)
+				}
+			}
+
+			gameDate, _ := time.Parse(time.RFC1123Z, event.GameDate)
+
+			domainEvent := domain.Event{
+				ID:            event.ID,
+				HomeTeamName:  event.HomeTeam.FullName,
+				AwayTeamName:  event.AwayTeam.FullName,
+				HomeTeamScore: event.BoxScore.Score.Home.Score,
+				AwayTeamScore: event.BoxScore.Score.Away.Score,
+				HomeOdds:      homeOdds,
+				GameDate:      gameDate,
+			}
 			filteredEvents = append(filteredEvents, domainEvent)
 		}
 	}
