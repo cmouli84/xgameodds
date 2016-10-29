@@ -5,23 +5,24 @@ import (
 
 	"github.com/cmouli84/xgameodds/infrastructure"
 	"github.com/cmouli84/xgameodds/interfaces"
+	"github.com/cmouli84/xgameodds/usecases"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	httpHandler := infrastructure.NewHTTPClient()
-	scoreApiHandler := infrastructure.NewScoreAPIHandler(httpHandler)
+	scoreAPIHandler := infrastructure.NewScoreAPIHandler(httpHandler)
 
-	scoreApiRepository := interfaces.NewScoreApiRepo(scoreApiHandler)
+	scoreAPIRepository := interfaces.NewScoreAPIRepo(scoreAPIHandler)
 
 	eventsInteractor := new(usecases.EventsInteractor)
-	eventsInteractor.EventsRepository = scoreApiRepository
+	eventsInteractor.EventsRepository = scoreAPIRepository
 
 	webapiHandler := new(interfaces.WebAPIHandler)
 	webapiHandler.EventsInteractor = eventsInteractor
 
 	r := mux.NewRouter()
-	r.HandleFunc("/api/events/{eventDate}", webapiHandler.GetEventsByDate).Methods("GET")
+	r.HandleFunc("/api/events/{eventdate}", webapiHandler.GetEventsByDate).Methods("GET")
 
 	http.ListenAndServe(":8181", r)
 }

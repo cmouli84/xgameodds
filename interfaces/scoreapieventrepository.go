@@ -12,8 +12,8 @@ import (
 
 // ScoreAPIInterface interface
 type ScoreAPIInterface interface {
-	GetSchedule() infrastructure.ScoreAPISchedule
-	GetEvents(eventIds []int) []infrastructure.ScoreAPIEvent
+	GetNflSchedule() infrastructure.ScoreAPISchedule
+	GetNflEvents(eventIds []int) []infrastructure.ScoreAPIEvent
 }
 
 // ScoreAPIRepo struct
@@ -30,8 +30,8 @@ func NewScoreAPIRepo(scoreAPIInterface ScoreAPIInterface) *ScoreAPIRepo {
 
 // GetEventsByDate function
 func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
-	schedule := scoreAPIRepo.scoreAPIInterface.GetSchedule()
-	parsedStartDate, _ := time.ParseInLocation("2016-01-02", date, time.Local)
+	schedule := scoreAPIRepo.scoreAPIInterface.GetNflSchedule()
+	parsedStartDate, _ := time.ParseInLocation("2006-01-02", date, time.Local)
 	parsedEndDate := parsedStartDate.Add(time.Hour * 24)
 
 	eventIds := make([]int, 0)
@@ -42,7 +42,7 @@ func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
 		}
 	}
 
-	events := scoreAPIRepo.scoreAPIInterface.GetEvents(eventIds)
+	events := scoreAPIRepo.scoreAPIInterface.GetNflEvents(eventIds)
 	filteredEvents := make([]domain.Event, 0)
 	var homeOdds float64
 	for _, event := range events {
@@ -69,7 +69,7 @@ func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
 				HomeTeamScore: event.BoxScore.Score.Home.Score,
 				AwayTeamScore: event.BoxScore.Score.Away.Score,
 				HomeOdds:      homeOdds,
-				GameDate:      gameDate,
+				GameDate:      gameDate.Local(),
 			}
 			filteredEvents = append(filteredEvents, domainEvent)
 		}

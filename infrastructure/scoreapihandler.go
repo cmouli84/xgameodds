@@ -16,7 +16,7 @@ type ScoreAPIHTTPClientHandler struct {
 const scoreAPIScheduleURL = "http://api.thescore.com/nfl/schedule"
 
 // scoreAPIEventsURLFormat constant
-const scoreAPIEventsURLFormat = "api.thescore.com/nfl/events?id.in=%s"
+const scoreAPIEventsURLFormat = "http://api.thescore.com/nfl/events?id.in=%s"
 
 // NewScoreAPIHandler function
 func NewScoreAPIHandler(httpClientInterface HTTPClientInterface) *ScoreAPIHTTPClientHandler {

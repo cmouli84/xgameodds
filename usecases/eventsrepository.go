@@ -1,4 +1,4 @@
-package usescases
+package usecases
 
 import "github.com/cmouli84/xgameodds/domain"
 
