@@ -12,7 +12,7 @@ import (
 
 // EventsInteractor interface
 type EventsInteractor interface {
-	GetEventsByDate(eventDate string) []domain.Event
+	GetNflEventsByDate(eventDate string) []domain.Event
 }
 
 // WebAPIHandler struct
@@ -20,12 +20,12 @@ type WebAPIHandler struct {
 	EventsInteractor EventsInteractor
 }
 
-// GetEventsByDate func
-func (handler *WebAPIHandler) GetEventsByDate(res http.ResponseWriter, req *http.Request) {
+// GetNflEventsByDate func
+func (handler *WebAPIHandler) GetNflEventsByDate(res http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	eventDate := vars["eventdate"]
 
-	events := handler.EventsInteractor.GetEventsByDate(eventDate)
+	events := handler.EventsInteractor.GetNflEventsByDate(eventDate)
 
 	eventsPayload, jsonErr := json.Marshal(&events)
 	if jsonErr != nil {

@@ -29,8 +29,8 @@ func NewScoreAPIRepo(scoreAPIInterface ScoreAPIInterface) *ScoreAPIRepo {
 	return scoreAPIRepo
 }
 
-// GetEventsByDate function
-func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
+// GetNflEventsByDate function
+func (scoreAPIRepo *ScoreAPIRepo) GetNflEventsByDate(date string) []domain.Event {
 	schedule := scoreAPIRepo.scoreAPIInterface.GetNflSchedule()
 	parsedStartDate, parseerr := time.ParseInLocation("2006-01-02", date, time.Local)
 	if parseerr != nil {

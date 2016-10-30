@@ -9,10 +9,10 @@ type EventsInteractor struct {
 
 // EventsRepository interface
 type EventsRepository interface {
-	GetEventsByDate(eventDate string) []domain.Event
+	GetNflEventsByDate(eventDate string) []domain.Event
 }
 
-// GetEventsByDate function
-func (interactor *EventsInteractor) GetEventsByDate(eventDate string) []domain.Event {
-	return interactor.EventsRepository.GetEventsByDate(eventDate)
+// GetNflEventsByDate function
+func (interactor *EventsInteractor) GetNflEventsByDate(eventDate string) []domain.Event {
+	return interactor.EventsRepository.GetNflEventsByDate(eventDate)
 }

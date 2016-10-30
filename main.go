@@ -22,7 +22,7 @@ func main() {
 	webapiHandler.EventsInteractor = eventsInteractor
 
 	r := mux.NewRouter()
-	r.HandleFunc("/api/events/{eventdate}", webapiHandler.GetEventsByDate).Methods("GET")
+	r.HandleFunc("/api/nfl/events/{eventdate}", webapiHandler.GetNflEventsByDate).Methods("GET")
 
 	http.ListenAndServe(":8181", r)
 }

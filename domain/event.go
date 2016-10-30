@@ -17,5 +17,5 @@ type Event struct {
 
 // EventsInterface interface
 type EventsInterface interface {
-	GetEventsByDate(eventDate string) []Event
+	GetNflEventsByDate(eventDate string) []Event
 }
