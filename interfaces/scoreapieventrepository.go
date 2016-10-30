@@ -1,6 +1,7 @@
 package interfaces
 
 import (
+	"fmt"
 	"time"
 
 	"strconv"
@@ -31,7 +32,12 @@ func NewScoreAPIRepo(scoreAPIInterface ScoreAPIInterface) *ScoreAPIRepo {
 // GetEventsByDate function
 func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
 	schedule := scoreAPIRepo.scoreAPIInterface.GetNflSchedule()
-	parsedStartDate, _ := time.ParseInLocation("2006-01-02", date, time.Local)
+	parsedStartDate, parseerr := time.ParseInLocation("2006-01-02", date, time.Local)
+	if parseerr != nil {
+		fmt.Println(parseerr)
+		return []domain.Event{}
+	}
+
 	parsedEndDate := parsedStartDate.Add(time.Hour * 24)
 
 	eventIds := make([]int, 0)
@@ -46,21 +52,30 @@ func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
 	filteredEvents := make([]domain.Event, 0)
 	var homeOdds float64
 	for _, event := range events {
-		eventDate, _ := time.Parse(time.RFC1123Z, event.GameDate)
+		eventDate, parseerr := time.Parse(time.RFC1123Z, event.GameDate)
+		if parseerr != nil {
+			fmt.Println(parseerr)
+			continue
+		}
 
 		if eventDate.After(parsedStartDate) && eventDate.Before(parsedEndDate) {
 			homeOdds = -999999
+			var odderr error
 
 			if !strings.HasPrefix(event.Odd.HomeOdd, "pk") && !strings.HasPrefix(event.Odd.HomeOdd, "N") {
 				if strings.HasPrefix(event.Odd.HomeOdd, "T") {
-					homeOdds, _ = strconv.ParseFloat(event.Odd.AwayOdd, 64)
+					homeOdds, odderr = strconv.ParseFloat(event.Odd.AwayOdd, 64)
+					if odderr != nil {
+						fmt.Println(odderr)
+					}
 					homeOdds *= -1
 				} else {
-					homeOdds, _ = strconv.ParseFloat(event.Odd.HomeOdd, 64)
+					homeOdds, odderr = strconv.ParseFloat(event.Odd.HomeOdd, 64)
+					if odderr != nil {
+						fmt.Println(odderr)
+					}
 				}
 			}
-
-			gameDate, _ := time.Parse(time.RFC1123Z, event.GameDate)
 
 			domainEvent := domain.Event{
 				ID:            event.ID,
@@ -69,7 +84,7 @@ func (scoreAPIRepo *ScoreAPIRepo) GetEventsByDate(date string) []domain.Event {
 				HomeTeamScore: event.BoxScore.Score.Home.Score,
 				AwayTeamScore: event.BoxScore.Score.Away.Score,
 				HomeOdds:      homeOdds,
-				GameDate:      gameDate.Local(),
+				GameDate:      eventDate.Local(),
 			}
 			filteredEvents = append(filteredEvents, domainEvent)
 		}

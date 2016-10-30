@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -34,13 +35,15 @@ type HTTPClientHandler struct {
 func (httpClientHandler *HTTPClientHandler) GetHTTPResponse(url string) []byte {
 	resp, err := httpClientHandler.Client.Get(url)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return []byte{}
 	}
 	defer resp.Body.Close()
 
 	response, ioerr := ioutil.ReadAll(resp.Body)
 	if ioerr != nil {
-		panic(ioerr)
+		fmt.Println(ioerr)
+		return []byte{}
 	}
 	return response
 }

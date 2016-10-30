@@ -1,6 +1,7 @@
 package interfaces
 
 import (
+	"fmt"
 	"net/http"
 
 	"encoding/json"
@@ -28,7 +29,7 @@ func (handler *WebAPIHandler) GetEventsByDate(res http.ResponseWriter, req *http
 
 	eventsPayload, jsonErr := json.Marshal(&events)
 	if jsonErr != nil {
-		panic(jsonErr)
+		fmt.Println(jsonErr)
 	}
 
 	res.Header().Add("Content-Type", "application/json")

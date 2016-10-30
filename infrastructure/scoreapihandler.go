@@ -32,7 +32,7 @@ func (handler *ScoreAPIHTTPClientHandler) GetNflSchedule() ScoreAPISchedule {
 	schedule := ScoreAPISchedule{}
 	err := json.Unmarshal(response, &schedule)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	return schedule
@@ -52,7 +52,7 @@ func (handler *ScoreAPIHTTPClientHandler) GetNflEvents(eventIds []int) []ScoreAP
 	events := make([]ScoreAPIEvent, 0)
 	err := json.Unmarshal(response, &events)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	return events
