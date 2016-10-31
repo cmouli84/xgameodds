@@ -6,16 +6,21 @@ import (
 
 // Event struct
 type Event struct {
-	ID            int
-	GameDate      time.Time
-	HomeTeamName  string
-	AwayTeamName  string
-	HomeOdds      float64
-	HomeTeamScore int
-	AwayTeamScore int
+	ID                int
+	GameDate          time.Time
+	HomeTeamName      string
+	AwayTeamName      string
+	HomeOdds          float64
+	HomeTeamScore     int
+	AwayTeamScore     int
+	SonnyMooreRanking struct {
+		HomeRanking    float64
+		AwayRanking    float64
+		SonnyMooreOdds float64
+	}
 }
 
-// EventsInterface interface
-type EventsInterface interface {
+// EventsRepository interface
+type EventsRepository interface {
 	GetNflEventsByDate(eventDate string) []Event
 }

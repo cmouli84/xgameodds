@@ -12,11 +12,14 @@ import (
 func main() {
 	httpHandler := infrastructure.NewHTTPClient()
 	scoreAPIHandler := infrastructure.NewScoreAPIHandler(httpHandler)
+	sonnyMooreHandler := infrastructure.NewSonnyMooreHandler(httpHandler)
 
 	scoreAPIRepository := interfaces.NewScoreAPIRepo(scoreAPIHandler)
+	sonnyMooreRepository := interfaces.NewSonnyMooreRepo(sonnyMooreHandler)
 
 	eventsInteractor := new(usecases.EventsInteractor)
 	eventsInteractor.EventsRepository = scoreAPIRepository
+	eventsInteractor.SonnyMooreRepository = sonnyMooreRepository
 
 	webapiHandler := new(interfaces.WebAPIHandler)
 	webapiHandler.EventsInteractor = eventsInteractor
