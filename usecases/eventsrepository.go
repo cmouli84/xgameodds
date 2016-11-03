@@ -4,6 +4,8 @@ import (
 	"math"
 	"strings"
 
+	"time"
+
 	"github.com/cmouli84/xgameodds/domain"
 )
 
@@ -11,6 +13,7 @@ import (
 type EventsInteractor struct {
 	EventsRepository     domain.EventsRepository
 	SonnyMooreRepository domain.SonnyMooreRepository
+	DynamoDbRepository   domain.DynamoDbRepository
 }
 
 const sonnyMooreHomeAdvantage float64 = 2
@@ -21,9 +24,20 @@ func (interactor *EventsInteractor) GetNflEventsByDate(eventDate string) []domai
 
 	sonnyMooreRanking := interactor.SonnyMooreRepository.GetSonnyMooreNflRanking()
 
-	for index := range events {
-		awayRanking := sonnyMooreRanking[strings.ToUpper(events[index].AwayTeamName)]
-		homeRanking := sonnyMooreRanking[strings.ToUpper(events[index].HomeTeamName)]
+	pastEvents := getPastEvents(events)
+	pastRanking := interactor.DynamoDbRepository.GetNflPersistedRanking(pastEvents)
+	currentTime := time.Now()
+
+	var awayRanking, homeRanking float64
+	for index, event := range events {
+		if event.GameDate.Before(currentTime) {
+			awayRanking = pastRanking[event.ID].AwayRanking
+			homeRanking = pastRanking[event.ID].HomeRanking
+		} else {
+			awayRanking = sonnyMooreRanking[strings.ToUpper(events[index].AwayTeamName)]
+			homeRanking = sonnyMooreRanking[strings.ToUpper(events[index].HomeTeamName)]
+		}
+
 		homeOdds := awayRanking - homeRanking - sonnyMooreHomeAdvantage
 
 		events[index].SonnyMooreRanking.AwayRanking = awayRanking
@@ -44,4 +58,17 @@ func Round(input, places float64) float64 {
 		return math.Ceil(input-0.5) / pow
 	}
 	return math.Floor(input+0.5) / pow
+}
+
+func getPastEvents(events []domain.Event) []int {
+	currentTime := time.Now()
+
+	eventIds := make([]int, 0)
+	for _, event := range events {
+		if event.GameDate.Before(currentTime) {
+			eventIds = append(eventIds, event.ID)
+		}
+	}
+
+	return eventIds
 }

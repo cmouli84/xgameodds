@@ -20,6 +20,13 @@ type Event struct {
 	}
 }
 
+// PersistedRanking struct
+type PersistedRanking struct {
+	EventID     int
+	HomeRanking float64
+	AwayRanking float64
+}
+
 // EventsRepository interface
 type EventsRepository interface {
 	GetNflEventsByDate(eventDate string) []Event
