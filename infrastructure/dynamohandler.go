@@ -48,6 +48,8 @@ func NewDynamoDbHandler(dynamodbClient *dynamodb.DynamoDB) *DynamoDbHandler {
 // GetNflPersistedRanking func
 func (dyanmodbHandler *DynamoDbHandler) GetNflPersistedRanking(eventIds []int) map[int]domain.PersistedRanking {
 
+	fmt.Println("PERSISTED RANKING")
+
 	keys := make([]map[string]*dynamodb.AttributeValue, 0)
 
 	for i := 0; i < len(eventIds); i++ {

@@ -35,6 +35,8 @@ func (handler *ScoreAPIHTTPClientHandler) GetNflSchedule() ScoreAPISchedule {
 		fmt.Println(err)
 	}
 
+	fmt.Println("SCHEDULE")
+
 	return schedule
 }
 
@@ -54,6 +56,8 @@ func (handler *ScoreAPIHTTPClientHandler) GetNflEvents(eventIds []int) []ScoreAP
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	fmt.Println("EVENT")
 
 	return events
 }

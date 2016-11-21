@@ -33,6 +33,8 @@ func NewSonnyMooreHandler(httpClientInterface HTTPClientInterface) *SonnyMooreHT
 
 // GetSonnyMooreNflRanking function
 func (handler *SonnyMooreHTTPClientHandler) GetSonnyMooreNflRanking() map[string]float64 {
+	fmt.Println("SONNYMOORERANKING")
+
 	return handler.extractSonnyMooreRanking(sonnyMooreNflRankingURL, sonnyMooreNflRankingStartsWith, sonnyMooreNflRankingEndsWith)
 }
 
