@@ -7,33 +7,47 @@ import (
 
 // CachedScoreAPIRepo struct
 type CachedScoreAPIRepo struct {
-	scoreAPIRepo domain.EventsRepository
-	dataCache    *cache.Cache
+	scoreAPIRepo   domain.EventsRepository
+	nflDataCache   *cache.Cache
+	ncaabDataCache *cache.Cache
 }
 
+type getEventsByDate func(date string) []domain.Event
+
 // NewCachedScoreAPIRepo function
-func NewCachedScoreAPIRepo(scoreRepoInterface domain.EventsRepository, datacache *cache.Cache) *CachedScoreAPIRepo {
+func NewCachedScoreAPIRepo(scoreRepoInterface domain.EventsRepository, nflDataCache *cache.Cache, ncaabDataCache *cache.Cache) *CachedScoreAPIRepo {
 	cachedScoreAPIRepo := new(CachedScoreAPIRepo)
 	cachedScoreAPIRepo.scoreAPIRepo = scoreRepoInterface
-    cachedScoreAPIRepo.dataCache = datacache
+	cachedScoreAPIRepo.nflDataCache = nflDataCache
+	cachedScoreAPIRepo.ncaabDataCache = ncaabDataCache
 	return cachedScoreAPIRepo
 }
 
 // GetNflEventsByDate function
 func (cachedScoreAPIRepo *CachedScoreAPIRepo) GetNflEventsByDate(date string) []domain.Event {
-	var nflEventsInterface interface{}
-	var nflEvents *[]domain.Event
+	return cachedScoreAPIRepo.getEventsByDate(date, cachedScoreAPIRepo.scoreAPIRepo.GetNflEventsByDate, cachedScoreAPIRepo.nflDataCache)
+}
+
+// GetNcaabEventsByDate function
+func (cachedScoreAPIRepo *CachedScoreAPIRepo) GetNcaabEventsByDate(date string) []domain.Event {
+	return cachedScoreAPIRepo.getEventsByDate(date, cachedScoreAPIRepo.scoreAPIRepo.GetNcaabEventsByDate, cachedScoreAPIRepo.ncaabDataCache)
+}
+
+// getEventsByDate function
+func (cachedScoreAPIRepo *CachedScoreAPIRepo) getEventsByDate(date string, getEventsByDateFn getEventsByDate, dataCache *cache.Cache) []domain.Event {
+	var eventsInterface interface{}
+	var events *[]domain.Event
 	var found bool
 
-	nflEventsInterface, found = cachedScoreAPIRepo.dataCache.Get(date)
+	eventsInterface, found = dataCache.Get(date)
 
 	if found {
-		nflEvents = nflEventsInterface.(*[]domain.Event)
+		events = eventsInterface.(*[]domain.Event)
 	} else {
-		nflEventsRepo := cachedScoreAPIRepo.scoreAPIRepo.GetNflEventsByDate(date)
-		nflEvents = &nflEventsRepo
+		eventsRepo := getEventsByDateFn(date)
+		events = &eventsRepo
 
-		cachedScoreAPIRepo.dataCache.Set(date, nflEvents, cache.DefaultExpiration)
+		dataCache.Set(date, events, cache.DefaultExpiration)
 	}
-	return *nflEvents
+	return *events
 }

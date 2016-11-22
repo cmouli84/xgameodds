@@ -5,6 +5,7 @@ import "github.com/cmouli84/xgameodds/domain"
 // DynamoDbInterface interface
 type DynamoDbInterface interface {
 	GetNflPersistedRanking(eventIds []int) map[int]domain.PersistedRanking
+	GetNcaabPersistedRanking(eventIds []int) map[int]domain.PersistedRanking
 }
 
 // DynamoDbRepo struct
@@ -22,4 +23,9 @@ func NewDynamoDbRepo(dynamodbInterface DynamoDbInterface) *DynamoDbRepo {
 // GetNflPersistedRanking function
 func (dynamodbRepo *DynamoDbRepo) GetNflPersistedRanking(eventIds []int) map[int]domain.PersistedRanking {
 	return dynamodbRepo.dynamodbInterface.GetNflPersistedRanking(eventIds)
+}
+
+// GetNcaabPersistedRanking function
+func (dynamodbRepo *DynamoDbRepo) GetNcaabPersistedRanking(eventIds []int) map[int]domain.PersistedRanking {
+	return dynamodbRepo.dynamodbInterface.GetNcaabPersistedRanking(eventIds)
 }

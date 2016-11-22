@@ -19,18 +19,24 @@ func main() {
 
 	dynamodbClient := infrastructure.NewDynamoDbClient()
 	dynamodbHandler := infrastructure.NewDynamoDbHandler(dynamodbClient)
+	teamDynamoClient := infrastructure.NewDynamoDbClient()
+	teamnamedbHandler := infrastructure.NewTeamnameDbHandler(teamDynamoClient)
 
 	scoreAPIRepository := interfaces.NewScoreAPIRepo(scoreAPIHandler)
-	sonnyMooreRepository := interfaces.NewSonnyMooreRepo(sonnyMooreHandler)
+	sonnyMooreRepository := interfaces.NewSonnyMooreRepo(sonnyMooreHandler, teamnamedbHandler)
 	dynamodbRepository := interfaces.NewDynamoDbRepo(dynamodbHandler)
 
-	scoreAPICache := cache.New(time.Minute*15, time.Minute*1)
-	sonnyMooreCache := cache.New(time.Hour*6, time.Minute*1)
-	dynamodbRepositoryCache := cache.New(time.Hour*24*7*30, time.Minute*1)
+	nflScoreAPICache := cache.New(time.Minute*15, time.Minute*1)
+	nflSonnyMooreCache := cache.New(time.Hour*6, time.Minute*1)
+	nflDynamodbRepositoryCache := cache.New(time.Hour*24*7*30, time.Minute*1)
 
-	cachedScoreAPIRepo := interfaces.NewCachedScoreAPIRepo(scoreAPIRepository, scoreAPICache)
-	cachedSonnyMooreRepo := interfaces.NewCachedSonnyMooreRepo(sonnyMooreRepository, sonnyMooreCache)
-	cachedDynamoDbRepo := interfaces.NewCachedPersistedRankingRepo(dynamodbRepository, dynamodbRepositoryCache)
+	ncaabScoreAPICache := cache.New(time.Minute*15, time.Minute*1)
+	ncaabSonnyMooreCache := cache.New(time.Hour*6, time.Minute*1)
+	ncaabDynamodbRepositoryCache := cache.New(time.Hour*24*7*30, time.Minute*1)
+
+	cachedScoreAPIRepo := interfaces.NewCachedScoreAPIRepo(scoreAPIRepository, nflScoreAPICache, ncaabScoreAPICache)
+	cachedSonnyMooreRepo := interfaces.NewCachedSonnyMooreRepo(sonnyMooreRepository, nflSonnyMooreCache, ncaabSonnyMooreCache)
+	cachedDynamoDbRepo := interfaces.NewCachedPersistedRankingRepo(dynamodbRepository, nflDynamodbRepositoryCache, ncaabDynamodbRepositoryCache)
 
 	eventsInteractor := new(usecases.EventsInteractor)
 	eventsInteractor.EventsRepository = cachedScoreAPIRepo
@@ -42,6 +48,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/nfl/events/{eventdate}", webapiHandler.GetNflEventsByDate).Methods("GET")
+	r.HandleFunc("/api/ncaab/events/{eventdate}", webapiHandler.GetNflEventsByDate).Methods("GET")
 
 	http.ListenAndServe(":8181", r)
 }

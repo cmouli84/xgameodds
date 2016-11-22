@@ -30,4 +30,5 @@ type PersistedRanking struct {
 // EventsRepository interface
 type EventsRepository interface {
 	GetNflEventsByDate(eventDate string) []Event
+	GetNcaabEventsByDate(eventDate string) []Event
 }

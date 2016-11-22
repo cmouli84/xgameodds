@@ -15,7 +15,13 @@ import (
 type ScoreAPIInterface interface {
 	GetNflSchedule() infrastructure.ScoreAPISchedule
 	GetNflEvents(eventIds []int) []infrastructure.ScoreAPIEvent
+	GetNcaabSchedule() infrastructure.ScoreAPISchedule
+	GetNcaabEvents(eventIds []int) []infrastructure.ScoreAPIEvent
 }
+
+type getSchedule func() infrastructure.ScoreAPISchedule
+
+type getEvents func(eventIds []int) []infrastructure.ScoreAPIEvent
 
 // ScoreAPIRepo struct
 type ScoreAPIRepo struct {
@@ -29,9 +35,19 @@ func NewScoreAPIRepo(scoreAPIInterface ScoreAPIInterface) *ScoreAPIRepo {
 	return scoreAPIRepo
 }
 
+// GetNcaabEventsByDate function
+func (scoreAPIRepo *ScoreAPIRepo) GetNcaabEventsByDate(date string) []domain.Event {
+	return scoreAPIRepo.getEventsByDate(date, scoreAPIRepo.scoreAPIInterface.GetNcaabSchedule, scoreAPIRepo.scoreAPIInterface.GetNcaabEvents)
+}
+
 // GetNflEventsByDate function
 func (scoreAPIRepo *ScoreAPIRepo) GetNflEventsByDate(date string) []domain.Event {
-	schedule := scoreAPIRepo.scoreAPIInterface.GetNflSchedule()
+	return scoreAPIRepo.getEventsByDate(date, scoreAPIRepo.scoreAPIInterface.GetNflSchedule, scoreAPIRepo.scoreAPIInterface.GetNflEvents)
+}
+
+// getEventsByDate function
+func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn getSchedule, getEventsFn getEvents) []domain.Event {
+	schedule := getScheduleFn()
 	parsedStartDate, parseerr := time.ParseInLocation("2006-01-02", date, time.Local)
 	if parseerr != nil {
 		fmt.Println(parseerr)
@@ -48,7 +64,7 @@ func (scoreAPIRepo *ScoreAPIRepo) GetNflEventsByDate(date string) []domain.Event
 		}
 	}
 
-	events := scoreAPIRepo.scoreAPIInterface.GetNflEvents(eventIds)
+	events := getEventsFn(eventIds)
 	filteredEvents := make([]domain.Event, 0)
 	var homeOdds float64
 	for _, event := range events {

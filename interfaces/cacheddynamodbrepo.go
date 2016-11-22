@@ -9,20 +9,33 @@ import (
 
 // CachedPersistedRankingRepo struct
 type CachedPersistedRankingRepo struct {
-	dynamodbRepo domain.DynamoDbRepository
-	dataCache    *cache.Cache
+	dynamodbRepo   domain.DynamoDbRepository
+	nflDataCache   *cache.Cache
+	ncaabDataCache *cache.Cache
 }
 
+type getPersistedRanking func(eventIds []int) map[int]domain.PersistedRanking
+
 // NewCachedPersistedRankingRepo function
-func NewCachedPersistedRankingRepo(dynamodbRepo domain.DynamoDbRepository, datacache *cache.Cache) *CachedPersistedRankingRepo {
+func NewCachedPersistedRankingRepo(dynamodbRepo domain.DynamoDbRepository, nflDataCache *cache.Cache, ncaabDataCache *cache.Cache) *CachedPersistedRankingRepo {
 	cachedPersistedRankingRepo := new(CachedPersistedRankingRepo)
 	cachedPersistedRankingRepo.dynamodbRepo = dynamodbRepo
-	cachedPersistedRankingRepo.dataCache = datacache
+	cachedPersistedRankingRepo.nflDataCache = nflDataCache
+	cachedPersistedRankingRepo.ncaabDataCache = ncaabDataCache
 	return cachedPersistedRankingRepo
 }
 
+// GetNcaabPersistedRanking function
+func (cachedPersistedRankingRepo *CachedPersistedRankingRepo) GetNcaabPersistedRanking(eventIDs []int) map[int]domain.PersistedRanking {
+	return cachedPersistedRankingRepo.getPersistedRanking(eventIDs, cachedPersistedRankingRepo.dynamodbRepo.GetNcaabPersistedRanking, cachedPersistedRankingRepo.ncaabDataCache)
+}
+
 // GetNflPersistedRanking function
-func (cachedPersistedRankingRepo *CachedPersistedRankingRepo) GetNflPersistedRanking(eventIds []int) map[int]domain.PersistedRanking {
+func (cachedPersistedRankingRepo *CachedPersistedRankingRepo) GetNflPersistedRanking(eventIDs []int) map[int]domain.PersistedRanking {
+	return cachedPersistedRankingRepo.getPersistedRanking(eventIDs, cachedPersistedRankingRepo.dynamodbRepo.GetNflPersistedRanking, cachedPersistedRankingRepo.nflDataCache)
+}
+
+func (cachedPersistedRankingRepo *CachedPersistedRankingRepo) getPersistedRanking(eventIds []int, getPersistedRankingFn getPersistedRanking, dataCache *cache.Cache) map[int]domain.PersistedRanking {
 	var persistedRankingInterface interface{}
 	var persistedRankingPtr *domain.PersistedRanking
 	var found bool
@@ -30,7 +43,7 @@ func (cachedPersistedRankingRepo *CachedPersistedRankingRepo) GetNflPersistedRan
 	notFoundEventIds := make([]int, 0)
 
 	for _, eventID := range eventIds {
-		persistedRankingInterface, found = cachedPersistedRankingRepo.dataCache.Get(strconv.Itoa(eventID))
+		persistedRankingInterface, found = dataCache.Get(strconv.Itoa(eventID))
 
 		if found {
 			persistedRankingPtr = persistedRankingInterface.(*domain.PersistedRanking)
@@ -41,11 +54,11 @@ func (cachedPersistedRankingRepo *CachedPersistedRankingRepo) GetNflPersistedRan
 	}
 
 	if len(notFoundEventIds) > 0 {
-		persistedRankingRepo := cachedPersistedRankingRepo.dynamodbRepo.GetNflPersistedRanking(notFoundEventIds)
+		persistedRankingRepo := getPersistedRankingFn(notFoundEventIds)
 
 		for k, v := range persistedRankingRepo {
 			persistedRankingMap[k] = v
-			cachedPersistedRankingRepo.dataCache.Set(strconv.Itoa(k), &v, cache.DefaultExpiration)
+			dataCache.Set(strconv.Itoa(k), &v, cache.DefaultExpiration)
 		}
 	}
 

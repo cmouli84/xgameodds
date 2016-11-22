@@ -14,13 +14,15 @@ import (
 
 const nflEventsTableName = "NflEvents"
 
-const nflEventsPrimaryKey = "EventId"
+const ncaabEventsTableName = "NcaabEvents"
 
-const nflEventsEventIdField = "EventId"
+const primaryKey = "EventId"
 
-const nflEventsHomeTeamRankingField = "HomeTeamRanking"
+const eventIDField = "EventId"
 
-const nflEventsAwayTeamRankingField = "AwayTeamRanking"
+const homeTeamRankingField = "HomeTeamRanking"
+
+const awayTeamRankingField = "AwayTeamRanking"
 
 // NewDynamoDbClient function
 func NewDynamoDbClient() *dynamodb.DynamoDB {
@@ -46,30 +48,37 @@ func NewDynamoDbHandler(dynamodbClient *dynamodb.DynamoDB) *DynamoDbHandler {
 }
 
 // GetNflPersistedRanking func
-func (dyanmodbHandler *DynamoDbHandler) GetNflPersistedRanking(eventIds []int) map[int]domain.PersistedRanking {
+func (dynamodbHandler *DynamoDbHandler) GetNflPersistedRanking(eventIds []int) map[int]domain.PersistedRanking {
+	return dynamodbHandler.getPersistedRanking(eventIds, nflEventsTableName)
+}
 
-	fmt.Println("PERSISTED RANKING")
+// GetNcaabPersistedRanking func
+func (dynamodbHandler *DynamoDbHandler) GetNcaabPersistedRanking(eventIds []int) map[int]domain.PersistedRanking {
+	return dynamodbHandler.getPersistedRanking(eventIds, ncaabEventsTableName)
+}
 
+// getPersistedRanking function
+func (dynamodbHandler *DynamoDbHandler) getPersistedRanking(eventIds []int, tableName string) map[int]domain.PersistedRanking {
 	keys := make([]map[string]*dynamodb.AttributeValue, 0)
 
 	for i := 0; i < len(eventIds); i++ {
 		keyMap := make(map[string]*dynamodb.AttributeValue)
-		keyMap[nflEventsPrimaryKey] = &dynamodb.AttributeValue{N: aws.String(strconv.Itoa(eventIds[i]))}
+		keyMap[primaryKey] = &dynamodb.AttributeValue{N: aws.String(strconv.Itoa(eventIds[i]))}
 
 		keys = append(keys, keyMap)
 	}
 
 	tableMap := make(map[string]*dynamodb.KeysAndAttributes)
-	tableMap[nflEventsTableName] = &dynamodb.KeysAndAttributes{
+	tableMap[tableName] = &dynamodb.KeysAndAttributes{
 		Keys:                 keys,
-		ProjectionExpression: aws.String(strings.Join([]string{nflEventsEventIdField, nflEventsHomeTeamRankingField, nflEventsAwayTeamRankingField}, ",")),
+		ProjectionExpression: aws.String(strings.Join([]string{eventIDField, homeTeamRankingField, awayTeamRankingField}, ",")),
 	}
 
 	params := &dynamodb.BatchGetItemInput{
 		RequestItems: tableMap,
 	}
 
-	response, err := dyanmodbHandler.dynamodbClient.BatchGetItem(params)
+	response, err := dynamodbHandler.dynamodbClient.BatchGetItem(params)
 
 	if err != nil {
 		fmt.Println(err)
@@ -79,10 +88,10 @@ func (dyanmodbHandler *DynamoDbHandler) GetNflPersistedRanking(eventIds []int) m
 	persistedRankingMap := make(map[int]domain.PersistedRanking)
 
 	for _, item := range response.Responses[nflEventsTableName] {
-		eventID, _ := strconv.Atoi(*item[nflEventsEventIdField].N)
+		eventID, _ := strconv.Atoi(*item[eventIDField].N)
 		persistedRanking := domain.PersistedRanking{}
-		persistedRanking.HomeRanking, _ = strconv.ParseFloat(*item[nflEventsHomeTeamRankingField].N, 64)
-		persistedRanking.AwayRanking, _ = strconv.ParseFloat(*item[nflEventsAwayTeamRankingField].N, 64)
+		persistedRanking.HomeRanking, _ = strconv.ParseFloat(*item[homeTeamRankingField].N, 64)
+		persistedRanking.AwayRanking, _ = strconv.ParseFloat(*item[awayTeamRankingField].N, 64)
 
 		persistedRankingMap[eventID] = persistedRanking
 	}

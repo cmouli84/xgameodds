@@ -12,11 +12,17 @@ type ScoreAPIHTTPClientHandler struct {
 	httpClientInterface HTTPClientInterface
 }
 
-// scoreAPIScheduleURL constant
-const scoreAPIScheduleURL = "http://api.thescore.com/nfl/schedule"
+// scoreAPINflScheduleURL constant
+const scoreAPINflScheduleURL = "http://api.thescore.com/nfl/schedule"
 
-// scoreAPIEventsURLFormat constant
-const scoreAPIEventsURLFormat = "http://api.thescore.com/nfl/events?id.in=%s"
+// scoreAPINcaabScheduleURL constant
+const scoreAPINcaabScheduleURL = "http://api.thescore.com/ncaab/schedule"
+
+// scoreAPINflEventsURLFormat constant
+const scoreAPINflEventsURLFormat = "http://api.thescore.com/nfl/events?id.in=%s"
+
+// scoreAPINcaabEventsURLFormat constant
+const scoreAPINcaabEventsURLFormat = "http://api.thescore.com/ncaab/events?id.in=%s"
 
 // NewScoreAPIHandler function
 func NewScoreAPIHandler(httpClientInterface HTTPClientInterface) *ScoreAPIHTTPClientHandler {
@@ -27,7 +33,27 @@ func NewScoreAPIHandler(httpClientInterface HTTPClientInterface) *ScoreAPIHTTPCl
 
 // GetNflSchedule function
 func (handler *ScoreAPIHTTPClientHandler) GetNflSchedule() ScoreAPISchedule {
-	response := handler.httpClientInterface.GetHTTPResponse(scoreAPIScheduleURL)
+	return handler.getSchedule(scoreAPINflScheduleURL)
+}
+
+// GetNcaabSchedule function
+func (handler *ScoreAPIHTTPClientHandler) GetNcaabSchedule() ScoreAPISchedule {
+	return handler.getSchedule(scoreAPINcaabScheduleURL)
+}
+
+// GetNflEvents function
+func (handler *ScoreAPIHTTPClientHandler) GetNflEvents(eventIds []int) []ScoreAPIEvent {
+	return handler.getEvents(scoreAPINflEventsURLFormat, eventIds)
+}
+
+// GetNcaabEvents function
+func (handler *ScoreAPIHTTPClientHandler) GetNcaabEvents(eventIds []int) []ScoreAPIEvent {
+	return handler.getEvents(scoreAPINcaabEventsURLFormat, eventIds)
+}
+
+// getSchedule function
+func (handler *ScoreAPIHTTPClientHandler) getSchedule(scheduleURL string) ScoreAPISchedule {
+	response := handler.httpClientInterface.GetHTTPResponse(scheduleURL)
 
 	schedule := ScoreAPISchedule{}
 	err := json.Unmarshal(response, &schedule)
@@ -35,13 +61,11 @@ func (handler *ScoreAPIHTTPClientHandler) GetNflSchedule() ScoreAPISchedule {
 		fmt.Println(err)
 	}
 
-	fmt.Println("SCHEDULE")
-
 	return schedule
 }
 
-// GetNflEvents function
-func (handler *ScoreAPIHTTPClientHandler) GetNflEvents(eventIds []int) []ScoreAPIEvent {
+// getEvents function
+func (handler *ScoreAPIHTTPClientHandler) getEvents(eventsURL string, eventIds []int) []ScoreAPIEvent {
 	eventIDText := make([]string, len(eventIds))
 
 	for i, val := range eventIds {
@@ -49,15 +73,13 @@ func (handler *ScoreAPIHTTPClientHandler) GetNflEvents(eventIds []int) []ScoreAP
 	}
 
 	response := handler.httpClientInterface.GetHTTPResponse(
-		fmt.Sprintf(scoreAPIEventsURLFormat, strings.Join(eventIDText, ",")))
+		fmt.Sprintf(eventsURL, strings.Join(eventIDText, ",")))
 
 	events := make([]ScoreAPIEvent, 0)
 	err := json.Unmarshal(response, &events)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println("EVENT")
 
 	return events
 }

@@ -18,6 +18,13 @@ const sonnyMooreNflRankingStartsWith = "<B>\r\n"
 
 const sonnyMooreNflRankingEndsWith = "\r\n</H3>"
 
+// sonnyMooreNflRankingURL constant
+const sonnyMooreNcaabRankingURL = "http://sonnymoorepowerratings.com/m-basket.htm"
+
+const sonnyMooreNcaabRankingStartsWith = "<B>\r\n"
+
+const sonnyMooreNcaabRankingEndsWith = "\r\n<BR>"
+
 const rowDelimiter = "\r\n"
 
 const colDelimiter = "  "
@@ -31,10 +38,13 @@ func NewSonnyMooreHandler(httpClientInterface HTTPClientInterface) *SonnyMooreHT
 	return sonnyMooreHTTPClientHandler
 }
 
+// GetSonnyMooreNcaabRanking function
+func (handler *SonnyMooreHTTPClientHandler) GetSonnyMooreNcaabRanking() map[string]float64 {
+	return handler.extractSonnyMooreRanking(sonnyMooreNcaabRankingURL, sonnyMooreNcaabRankingStartsWith, sonnyMooreNcaabRankingEndsWith)
+}
+
 // GetSonnyMooreNflRanking function
 func (handler *SonnyMooreHTTPClientHandler) GetSonnyMooreNflRanking() map[string]float64 {
-	fmt.Println("SONNYMOORERANKING")
-
 	return handler.extractSonnyMooreRanking(sonnyMooreNflRankingURL, sonnyMooreNflRankingStartsWith, sonnyMooreNflRankingEndsWith)
 }
 
@@ -43,7 +53,9 @@ func (handler *SonnyMooreHTTPClientHandler) extractSonnyMooreRanking(url, starts
 
 	responseString := string(response)
 
-	extractedString := responseString[strings.Index(responseString, startsWith)+len(startsWith) : strings.Index(responseString, endsWith)]
+	extractedString := responseString[strings.Index(responseString, startsWith)+len(startsWith):]
+	fmt.Println(extractedString)
+	extractedString = extractedString[:strings.Index(extractedString, endsWith)]
 
 	teamRanks := handler.extractTeamRanks(extractedString)
 
