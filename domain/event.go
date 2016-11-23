@@ -6,18 +6,26 @@ import (
 
 // Event struct
 type Event struct {
-	ID                int
-	GameDate          time.Time
-	HomeTeamName      string
-	AwayTeamName      string
-	HomeOdds          float64
-	HomeTeamScore     int
-	AwayTeamScore     int
+	ID                int       `json:"id"`
+	GameDate          time.Time `json:"gameDate"`
+	HomeTeam          Team      `json:"homeTeam"`
+	AwayTeam          Team      `json:"awayTeam"`
+	HomeOdds          float64   `json:"homeOdds"`
+	HomeTeamScore     int       `json:"homeTeamScore"`
+	AwayTeamScore     int       `json:"awayTeamScore"`
 	SonnyMooreRanking struct {
-		HomeRanking    float64
-		AwayRanking    float64
-		SonnyMooreOdds float64
-	}
+		HomeRanking    float64 `json:"homeRanking"`
+		AwayRanking    float64 `json:"awayRanking"`
+		SonnyMooreOdds float64 `json:"sonnyMooreOdds"`
+	} `json:"sonnyMooreRanking"`
+}
+
+// Team struct
+type Team struct {
+	Name    string `json:"Name"`
+	LogoURL string `json:"logoUrl"`
+	Wins    int    `json:"wins"`
+	Loses   int    `json:"loses"`
 }
 
 // PersistedRanking struct

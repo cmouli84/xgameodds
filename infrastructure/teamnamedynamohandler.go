@@ -44,7 +44,7 @@ func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() map[string]strin
 
 	for _, item := range resp.Items {
 		sonnyMooreTeamName := item[ncaabSonnyMooreTeamName].S
-		scoreAPITeamName := item[ncaabScoreAPITeamTableName].S
+		scoreAPITeamName := item[ncaabScoreAPITeamName].S
 
 		teamMap[*sonnyMooreTeamName] = *scoreAPITeamName
 	}

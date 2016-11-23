@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -52,9 +51,7 @@ func (handler *SonnyMooreHTTPClientHandler) extractSonnyMooreRanking(url, starts
 	response := handler.httpClientInterface.GetHTTPResponse(url)
 
 	responseString := string(response)
-
 	extractedString := responseString[strings.Index(responseString, startsWith)+len(startsWith):]
-	fmt.Println(extractedString)
 	extractedString = extractedString[:strings.Index(extractedString, endsWith)]
 
 	teamRanks := handler.extractTeamRanks(extractedString)
@@ -71,7 +68,6 @@ func (handler *SonnyMooreHTTPClientHandler) extractTeamRanks(extractedTeams stri
 
 		rank, parseerr := strconv.ParseFloat(team[5], 64)
 		if parseerr != nil {
-			fmt.Println(parseerr)
 			continue
 		}
 		teamMap[teamName] = rank

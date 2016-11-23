@@ -50,8 +50,8 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 			awayRanking = pastRanking[event.ID].AwayRanking
 			homeRanking = pastRanking[event.ID].HomeRanking
 		} else {
-			awayRanking = sonnyMooreRanking[strings.ToUpper(events[index].AwayTeamName)]
-			homeRanking = sonnyMooreRanking[strings.ToUpper(events[index].HomeTeamName)]
+			awayRanking = sonnyMooreRanking[strings.ToUpper(events[index].AwayTeam.Name)]
+			homeRanking = sonnyMooreRanking[strings.ToUpper(events[index].HomeTeam.Name)]
 		}
 
 		homeOdds := awayRanking - homeRanking - sonnyMooreHomeAdvantage
