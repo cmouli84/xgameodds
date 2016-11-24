@@ -10,7 +10,7 @@ type Event struct {
 	GameDate          time.Time `json:"gameDate"`
 	HomeTeam          Team      `json:"homeTeam"`
 	AwayTeam          Team      `json:"awayTeam"`
-	HomeOdds          float64   `json:"homeOdds"`
+	WestgateHomeOdds  float64   `json:"westgateHomeOdds"`
 	HomeTeamScore     int       `json:"homeTeamScore"`
 	AwayTeamScore     int       `json:"awayTeamScore"`
 	SonnyMooreRanking struct {
@@ -22,7 +22,7 @@ type Event struct {
 
 // Team struct
 type Team struct {
-	Name    string `json:"Name"`
+	Name    string `json:"name"`
 	LogoURL string `json:"logoUrl"`
 	Wins    int    `json:"wins"`
 	Loses   int    `json:"loses"`

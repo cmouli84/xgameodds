@@ -78,7 +78,7 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 			homeOdds = -999999
 			var odderr error
 
-			if !strings.HasPrefix(event.Odd.HomeOdd, "pk") && !strings.HasPrefix(event.Odd.HomeOdd, "N") {
+			if (event.Odd.HomeOdd != "") && !strings.HasPrefix(event.Odd.HomeOdd, "pk") && !strings.HasPrefix(event.Odd.HomeOdd, "N") {
 				if strings.HasPrefix(event.Odd.HomeOdd, "T") {
 					homeOdds, odderr = strconv.ParseFloat(event.Odd.AwayOdd, 64)
 					if odderr != nil {
@@ -105,6 +105,13 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 				awayLoses, _ = strconv.Atoi(recs[1])
 			}
 
+			var homeScore = -999999
+			var awayScore = -999999
+			if eventDate.Before(time.Now()) {
+				homeScore = event.BoxScore.Score.Home.Score
+				awayScore = event.BoxScore.Score.Away.Score
+			}
+
 			domainEvent := domain.Event{
 				ID: event.ID,
 				HomeTeam: domain.Team{
@@ -119,10 +126,10 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 					Wins:    awayWins,
 					Loses:   awayLoses,
 				},
-				HomeTeamScore: event.BoxScore.Score.Home.Score,
-				AwayTeamScore: event.BoxScore.Score.Away.Score,
-				HomeOdds:      homeOdds,
-				GameDate:      eventDate.Local(),
+				HomeTeamScore:    homeScore,
+				AwayTeamScore:    awayScore,
+				WestgateHomeOdds: homeOdds,
+				GameDate:         eventDate.Local(),
 			}
 			filteredEvents = append(filteredEvents, domainEvent)
 		}

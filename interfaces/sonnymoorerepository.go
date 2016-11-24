@@ -1,11 +1,16 @@
 package interfaces
 
+import (
+	"strings"
+)
+
 // SonnyMooreInterface interface
 type SonnyMooreInterface interface {
 	GetSonnyMooreNflRanking() map[string]float64
 	GetSonnyMooreNcaabRanking() map[string]float64
 }
 
+// TeamnameMappingInterface interface
 type TeamnameMappingInterface interface {
 	GetNcaabTeamNames() map[string]string
 }
@@ -36,7 +41,7 @@ func (sonnyMooreRepo *SonnyMooreRepo) GetSonnyMooreNcaabRanking() map[string]flo
 	scoreAPIRankingMap := make(map[string]float64)
 
 	for k, v := range rankingMap {
-		scoreAPIRankingMap[teamMap[k]] = v
+		scoreAPIRankingMap[strings.ToUpper(teamMap[k])] = v
 	}
 
 	return scoreAPIRankingMap

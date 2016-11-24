@@ -49,6 +49,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/nfl/events/{eventdate}", webapiHandler.GetNflEventsByDate).Methods("GET")
 	r.HandleFunc("/api/ncaab/events/{eventdate}", webapiHandler.GetNcaabEventsByDate).Methods("GET")
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 
 	http.ListenAndServe(":8181", r)
 }

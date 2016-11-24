@@ -1,0 +1,435 @@
+<html ng-app="App">
+<head>
+  <meta charset="utf-8">
+  <title>National College Basketball Odds</title>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css" />
+  <script type='text/javascript' src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script type='text/javascript' src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.js"></script>
+  <script type="text/javascript">
+    var App = angular.module('App', []);
+
+    App.controller('NbacbCtrl', function($scope, $http, $filter) {
+      $http.get('/api/ncaab/events/' + $filter('date')(eventDate, "yyyy-MM-dd"))
+           .then(function(res){
+              $scope.picks = res.data;                
+            });
+      
+      $scope.eventDates = [];
+      
+      for (var i=0; i<21; i++) {
+          var eventDate = new Date();
+          eventDate.setDate(eventDate.getDate() - 10 + i);
+    	  $scope.eventDates.push({
+    		  date: eventDate,
+    		  selected: (i === 10)
+    	  });
+          if (i===10)
+          {
+        	  $scope.currentDate = $filter('date')(eventDate, "yyyy-MM-dd");
+        	  $scope.selectedDate = $filter('date')(eventDate, "yyyy-MM-dd");
+          }
+   	  }
+      
+      $scope.getWestGatePointSpread = function(westGatePointSpread) {
+    	  return (westGatePointSpread === -999999) ? "N/A" : westGatePointSpread;
+      }
+      
+      $scope.getSonnyMooreRatingDiff  = function(pick) {
+    	  return ((pick.sonnyMooreRanking.homeRanking === -999999 || pick.sonnyMooreRanking.awayRanking === -999999) 
+    	  		? "N/A" 
+    	  		: Math.round((pick.sonnyMooreRanking.homeRanking - pick.sonnyMooreRanking.awayRanking) * 100.0)/100.0);
+      }
+      
+      $scope.getSonnyMoorePowerRanking  = function(pick) {
+    	  return "("
+    	  		+ (pick.sonnyMooreRanking.awayRanking === -999999 ? "N/A" : pick.sonnyMooreRanking.awayRanking)
+    	  		+ " - "
+    	  		+ (pick.sonnyMooreRanking.homeRanking === -999999 ? "N/A" : pick.sonnyMooreRanking.homeRanking)
+    	  		+ ")";
+      }
+
+      $scope.getGameScore = function(pick) {
+    	  return (pick.homeTeamScore === -999999) ? "Not Started" : pick.homeTeamScore + "-" + pick.awayTeamScore;
+      }
+      
+      $scope.getSonnyMooreOdds = function(pick) {
+    	  return (pick.sonnyMooreRanking.sonnyMooreOdds === -999999) ? "Not Available" : pick.sonnyMooreRanking.sonnyMooreOdds;
+      }
+      
+      $scope.getGameRowClass = function() {
+    	  return ($scope.currentDate == $scope.selectedDate) ? "pointerRow " : "";
+      }
+      
+      $scope.getExpandClass = function(pick) {
+    	  return (pick.expanded ? " customicon-minus" : " customicon-plus") + (($scope.currentDate == $scope.selectedDate) ? "" : " customicon-hide");
+      }
+
+      $scope.getSonnyMooreStatusClass = function(pick) {
+    	  var sonnyMooreRatingDiff = $scope.getSonnyMooreRatingDiff(pick);
+    	  if (sonnyMooreRatingDiff === "N/A" || pick.westgateCurrentPointSpread === -999999)
+   		  {
+    		  return "";
+   		  }
+
+    	  var dtCurrentDate = new Date();
+    	  var dtGameDate = new Date(pick.gameDate);
+    	  dtGameDate.setFullYear((dtGameDate.getMonth()>6 && dtCurrentDate.getMonth()>6) || (dtGameDate.getMonth()<=6 && dtCurrentDate.getMonth()<=6) 
+    			  ? dtCurrentDate.getFullYear() : dtCurrentDate.getFullYear() - 1 );
+    	  dtGameDate.setHours(dtGameDate.getHours() + 3);
+    	  if (dtGameDate < dtCurrentDate)
+   		  {
+    		  if ((((pick.awayTeamScore - pick.homeTeamScore) > pick.westgateHomeOdds) && (sonnyMooreRatingDiff > pick.westgateHomeOdds)) 
+    				  || (((pick.awayTeamScore - pick.homeTeamScore) < pick.westgateHomeOdds) && (sonnyMooreRatingDiff < pick.westgateHomeOdds))) 
+   			  {
+   			  		return "positive";
+   			  }
+			  return "negative";
+   		  }
+    	  
+		  return "";
+      }
+      
+      $scope.getWestGateSpreadStatusClass = function(pick) {
+    	  if (pick.westgateHomeOdds === -999999 || pick.awayTeamScore === 0 || pick.homeTeamScore === 0)
+    	  {
+    		  return "";
+    	  }
+    	  
+    	  if (pick.westgateHomeOdds === (pick.awayTeamScore - pick.homeTeamScore))
+    	  {
+    		  return "tieRow";
+    	  }
+    	  
+    	  return "";
+      }
+
+      $scope.loadMatchesByDate = function(event) {
+          $http.get('/api/ncaab/events/' + $filter('date')(event.date, "yyyy-MM-dd"))
+          .then(function(res){
+             $scope.picks = res.data;
+         	 $scope.selectedDate = $filter('date')(event.date, "yyyy-MM-dd");
+             
+             angular.forEach($scope.eventDates, function(value, key) {
+            	  value.selected = (value.date == event.date);
+            	});
+           });
+      }
+      
+
+      $scope.getHomeOrAway = function(event) {
+    	  if (event.eventAtHome === true)
+    	  {
+    		  return "H";
+    	  }
+    	  if (event.eventAtHome === false)
+    	  {
+    		  return "A";
+    	  }
+    	  return "N/A";
+      }
+
+      $scope.getResult = function(event) {
+    	  var result = "";
+    	  if (event.eventAtHome === true)
+    	  {
+    		  if (event.homeTeamScore > event.awayTeamScore) result += "W ";
+    		  else if (event.homeTeamScore < event.awayTeamScore) result += "L ";
+    		  else result += "T ";
+    		  result += "(" + (event.homeTeamScore === -999999 ? "N/A" : event.homeTeamScore) + " - " + (event.awayTeamScore === -999999 ? "N/A" : event.awayTeamScore) + ")";
+    		  return result;
+    	  }
+    	  if (event.eventAtHome === false)
+    	  {
+    		  if (event.homeTeamScore < event.awayTeamScore) result += "W ";
+    		  else if (event.homeTeamScore > event.awayTeamScore) result += "L ";
+    		  else result += "T ";
+    		  result += "(" + (event.awayTeamScore === -999999 ? "N/A" : event.awayTeamScore) + " - " + (event.homeTeamScore === -999999 ? "N/A" : event.homeTeamScore) + ")";
+    		  return result;
+    	  }
+    	  return "N/A";
+      }
+      
+      $scope.expandRow = function(pick) {
+    	  pick.expanded = !pick.expanded;
+      }
+
+      
+    });
+
+  </script>
+  <style type="text/css">
+.wrapper {
+  position:relative;
+  margin:0 auto;
+  overflow:hidden;
+  padding:5px;
+  height:68px;
+}
+
+.list {
+  position:absolute;
+  left:0px;
+  top:0px;
+  min-width:3000px;
+  margin-left:12px;
+  margin-top:0px;
+}
+
+.list li{
+  display:table-cell;
+  position:relative;
+  text-align:center;
+  cursor:grab;
+  cursor:-webkit-grab;
+  color:#efefef;
+  vertical-align:middle;
+}
+.nav>li>a {
+  padding-top: 3px;
+  padding-bottom: 6px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.scroller {
+  text-align:center;
+  cursor:pointer;
+  display:none;
+  padding:7px;
+  padding-top:11px;
+  white-space:no-wrap;
+  vertical-align:middle;
+  background-color:#fff;
+}
+
+.scroller-right{
+  float:right;
+}
+
+.scroller-left {
+  float:left;
+}
+
+.pointerRow
+{
+	cursor:pointer
+}
+
+.tieRow {
+    background-color: #428BCA;
+    color:#fff;
+}
+.positive {
+    background-color:#3FB618;
+    color:#fff;
+}
+.negative {
+    background-color:#FF0039;
+    color:#fff;
+}
+.expandedRow {
+    background-color:#fff;
+    color:#000;
+}
+.oddRow {
+    background-color:#F9F9F9;
+}
+.divTableRow {
+    border-bottom-style: solid; 
+    border-bottom-width: 1px; 
+    border-bottom-color: #dddddd;
+}
+.divPadding {
+    padding: 8px 5px 8px 5px; 
+}
+.customicon {
+    font-weight: bold;
+}
+.customicon-plus:before {
+    content: "\2b";
+}
+.customicon-minus:before {
+    content: "\2212";
+}
+.customicon-hide {
+	opacity: 0;
+}
+.text-centeralign {
+	text-align: center
+}
+  </style>
+</head>
+<body>
+  <div ng-controller="NbacbCtrl">  
+    <div class="container">
+      <div class="scroller scroller-left"><i class="glyphicon glyphicon-chevron-left"></i></div>
+      <div class="scroller scroller-right"><i class="glyphicon glyphicon-chevron-right"></i></div>
+      <div class="wrapper">
+        <ul class="nav nav-tabs list" id="myTab" >
+          <li ng-class="{'active' : event.selected}" ng-repeat="event in eventDates">
+            <a href="#" class="text-uppercase" ng-click="loadMatchesByDate(event)"><div style="font-size: 25px">{{event.date | date:'dd'}}</div>{{event.date | date:'MMM'}}</a>
+          </li>
+      </ul>
+      </div>
+    </div>
+    <div class="container" style="font-size: 16px">
+      <div class="row divTableRow divPadding">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4"><strong>Match</strong></div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-centeralign"><strong>Westgate Odds</strong></div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign"><strong>Sonny Moore Odds (A-H)</strong></div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign"><strong>Score (Home-Away)</strong></div>
+      </div>
+      <div class="row divTableRow" ng-class-odd="getGameRowClass() + 'oddRow'" ng-class-even="getGameRowClass()" ng-click="expandRow(pick)" ng-repeat="pick in picks">
+        <div class="divPadding col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding-top: 4px">
+          <div>
+            <span class="customicon customicon-plus customicon-hide"></span>
+            <small>{{pick.gameDate}}</small>
+          </div>
+          <div>
+            <span class="customicon" ng-class="getExpandClass(pick)"></span>
+          	<image ng-src="{{pick.awayTeam.logoUrl}}" />
+            <strong>{{pick.awayTeam.name}} </strong>
+            <small>({{pick.awayTeam.wins}}-{{pick.awayTeam.loses}})</small>
+          </div>
+          <div>
+            <span class="customicon customicon-plus customicon-hide"></span>
+          	<image ng-src="{{pick.homeTeam.logoUrl}}" />
+           	<strong>@{{pick.homeTeam.name}} </strong> 
+            <small>({{pick.homeTeam.wins}}-{{pick.homeTeam.loses}})</small>
+          </div>
+        </div>
+        <div class="divPadding col-lg-2 col-md-2 col-sm-2 col-xs-2 text-centeralign" ng-class="getWestGateSpreadStatusClass(pick)"><br />
+          {{getWestGatePointSpread(pick.westgateHomeOdds)}}<br />&nbsp;
+        </div>
+        <div class="divPadding col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign">
+          <div style="line-height: 11px">&nbsp;</div>
+          {{getSonnyMooreOdds(pick)}}<br/>
+		  <div style="line-height: 11px">&nbsp;</div>{{getSonnyMoorePowerRanking(pick)}}
+        </div>
+        <div class="divPadding col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign"><br />
+          {{getGameScore(pick)}}
+        </div>
+        <div class="expandedRow col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="(pick.homeRecord == null && pick.awayRecord == null) || !pick.expanded ">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="pick.homeRecord != null">
+            <table class="table">
+              <tr>
+                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.homeTeamLogoUrl}}" />{{pick.homeTeam.name}}</th>
+        	  </tr>
+              <tr ng-if="pick.homeRecord.events.length > 0">
+                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Opponent</th>
+                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">H/A</th>
+                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Odds</th>
+                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Result</th>
+              </tr>
+              <tr ng-repeat="event in pick.homeRecord.events">
+                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        	      {{event.opponentTeamName}}
+        	    </td>
+                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        	      {{getHomeOrAway(event)}}
+        	    </td>
+                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        	      {{getWestGatePointSpread(event.westgateHomeOdds)}}
+        	    </td>
+                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        	      {{getResult(event)}}
+        	    </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="pick.awayRecord != null">
+            <table class="table">
+              <tr>
+                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.awayTeamLogoUrl}}" />{{pick.awayTeam.name}}</th>
+        	  </tr>
+              <tr ng-if="pick.awayRecord.events.length > 0">
+                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Opponent</th>
+                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">H/A</th>
+                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Odds</th>
+                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Result</th>
+              </tr>
+              <tr ng-repeat="event in pick.awayRecord.events">
+                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        	      {{event.opponentTeamName}}
+        	    </td>
+                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        	      {{getHomeOrAway(event)}}
+        	    </td>
+                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        	      {{getWestGatePointSpread(event.westgateHomeOdds)}}
+        	    </td>
+                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        	      {{getResult(event)}}
+        	    </td>
+              </tr>
+              </table>
+            </div>
+          </div> 
+        </div>
+    </div> 
+  </div>
+  <script type='text/javascript'>
+        
+    $(document).ready(function() {
+      var hidWidth;
+      var scrollBarWidths = 40;
+      var widthOfList = function(){
+        var itemsWidth = 0;
+        $('.list li').each(function(){
+          var itemWidth = $(this).outerWidth();
+          itemsWidth+=itemWidth;
+        });
+        return itemsWidth;
+      };
+
+      var widthOfHidden = function(){
+        return (($('.wrapper').outerWidth())-widthOfList()-getLeftPosi())-scrollBarWidths;
+      };
+
+      var getLeftPosi = function(){
+        return $('.list').position().left;
+      };
+
+      var reAdjust = function(){
+        if (($('.wrapper').outerWidth()) < widthOfList()) {
+        $('.scroller-right').show();
+      }
+      else {
+        $('.scroller-right').hide();
+      }
+  
+      if (getLeftPosi()<0) {
+        $('.scroller-left').show();
+      }
+      else {
+        $('.item').animate({left:"-="+getLeftPosi()+"px"},'slow');
+        $('.scroller-left').hide();
+      }
+    }
+
+    reAdjust();
+
+    $(window).on('resize',function(e){  
+      reAdjust();
+    });
+
+    $('.scroller-right').click(function() {
+      $('.scroller-left').fadeIn('slow');
+      $('.scroller-right').fadeOut('slow');
+  
+      $('.list').animate({left:"+="+widthOfHidden()+"px"},'slow',function(){
+      });
+    });
+
+    $('.scroller-left').click(function() {
+	  $('.scroller-right').fadeIn('slow');
+      $('.scroller-left').fadeOut('slow');
+  
+      $('.list').animate({left:"-="+getLeftPosi()+"px"},'slow',function(){
+  	  });
+    });
+  });
+  </script>
+</body>
+</html>
