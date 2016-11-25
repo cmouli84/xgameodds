@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"strconv"
@@ -48,18 +49,19 @@ func (scoreAPIRepo *ScoreAPIRepo) GetNflEventsByDate(date string) []domain.Event
 // getEventsByDate function
 func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn getSchedule, getEventsFn getEvents) []domain.Event {
 	schedule := getScheduleFn()
-	parsedStartDate, parseerr := time.ParseInLocation("2006-01-02", date, time.UTC)
+	parsedStartDate, parseerr := time.ParseInLocation("2006-01-02", date, time.Local)
 	if parseerr != nil {
 		fmt.Println(parseerr)
 		return []domain.Event{}
 	}
+	parsedStartDate = parsedStartDate.UTC()
 
 	parsedEndDate := parsedStartDate.Add(time.Hour * 24)
 
 	eventIds := make([]int, 0)
 	for _, season := range schedule.CurrentSeason {
-		if (season.StartDate.Before(parsedStartDate) && season.EndDate.After(parsedStartDate)) ||
-			(season.StartDate.Before(parsedEndDate) && season.EndDate.After(parsedEndDate)) {
+		if (season.StartDate.Before(parsedStartDate) && season.EndDate.After(parsedStartDate)) || season.StartDate.Equal(parsedStartDate) ||
+			(season.StartDate.Before(parsedEndDate) && season.EndDate.After(parsedEndDate)) || season.StartDate.Equal(parsedEndDate) {
 			eventIds = append(eventIds, season.EventIds...)
 		}
 	}
@@ -67,6 +69,7 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 	events := getEventsFn(eventIds)
 	filteredEvents := make([]domain.Event, 0)
 	var homeOdds float64
+
 	for _, event := range events {
 		eventDate, parseerr := time.Parse(time.RFC1123Z, event.GameDate)
 		if parseerr != nil {
@@ -74,7 +77,7 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 			continue
 		}
 
-		if eventDate.After(parsedStartDate) && eventDate.Before(parsedEndDate) {
+		if (eventDate.After(parsedStartDate) && eventDate.Before(parsedEndDate)) || eventDate.Equal(parsedStartDate) {
 			homeOdds = -999999
 			var odderr error
 
@@ -134,6 +137,8 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 			filteredEvents = append(filteredEvents, domainEvent)
 		}
 	}
+
+	sort.Sort(domain.Events(filteredEvents))
 
 	return filteredEvents
 }

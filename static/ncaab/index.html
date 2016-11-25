@@ -11,7 +11,7 @@
     var App = angular.module('App', []);
 
     App.controller('NbacbCtrl', function($scope, $http, $filter) {
-      $http.get('/api/ncaab/events/' + $filter('date')(eventDate, "yyyy-MM-dd"))
+      $http.get('/api/ncaab/events/' + $filter('date')(new Date(), "yyyy-MM-dd"))
            .then(function(res){
               $scope.picks = res.data;                
             });
@@ -284,7 +284,7 @@
         <div class="divPadding col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding-top: 4px">
           <div>
             <span class="customicon customicon-plus customicon-hide"></span>
-            <small>{{pick.gameDate}}</small>
+            <small>{{pick.gameDate | date:'yyyy-MM-dd hh:mma' + " PST"}}</small>
           </div>
           <div>
             <span class="customicon" ng-class="getExpandClass(pick)"></span>
@@ -302,10 +302,10 @@
         <div class="divPadding col-lg-2 col-md-2 col-sm-2 col-xs-2 text-centeralign" ng-class="getWestGateSpreadStatusClass(pick)"><br />
           {{getWestGatePointSpread(pick.westgateHomeOdds)}}<br />&nbsp;
         </div>
-        <div class="divPadding col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign">
+        <div class="divPadding col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign" ng-class="getSonnyMooreStatusClass(pick)">
           <div style="line-height: 11px">&nbsp;</div>
           {{getSonnyMooreOdds(pick)}}<br/>
-		  <div style="line-height: 11px">&nbsp;</div>{{getSonnyMoorePowerRanking(pick)}}
+		      {{getSonnyMoorePowerRanking(pick)}}<div style="line-height: 11px">&nbsp;</div>
         </div>
         <div class="divPadding col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign"><br />
           {{getGameScore(pick)}}

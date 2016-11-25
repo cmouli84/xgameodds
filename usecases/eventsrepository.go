@@ -22,20 +22,22 @@ type getSonnyMooreRanking func() map[string]float64
 
 type getPersistedRanking func(eventIds []int) map[int]domain.PersistedRanking
 
-const sonnyMooreHomeAdvantage float64 = 2
+const sonnyMooreNflHomeAdvantage float64 = 2
+
+const sonnyMooreNcaabHomeAdvantage float64 = 3.25
 
 // GetNflEventsByDate function
 func (interactor *EventsInteractor) GetNflEventsByDate(eventDate string) []domain.Event {
-	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNflEventsByDate, interactor.SonnyMooreRepository.GetSonnyMooreNflRanking, interactor.DynamoDbRepository.GetNflPersistedRanking)
+	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNflEventsByDate, interactor.SonnyMooreRepository.GetSonnyMooreNflRanking, interactor.DynamoDbRepository.GetNflPersistedRanking, sonnyMooreNflHomeAdvantage)
 }
 
 // GetNcaabEventsByDate function
 func (interactor *EventsInteractor) GetNcaabEventsByDate(eventDate string) []domain.Event {
-	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNcaabEventsByDate, interactor.SonnyMooreRepository.GetSonnyMooreNcaabRanking, interactor.DynamoDbRepository.GetNcaabPersistedRanking)
+	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNcaabEventsByDate, interactor.SonnyMooreRepository.GetSonnyMooreNcaabRanking, interactor.DynamoDbRepository.GetNcaabPersistedRanking, sonnyMooreNcaabHomeAdvantage)
 }
 
 // getEventsByDate function
-func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventByDateFn getEventsByDate, getSonnyMooreRankingFn getSonnyMooreRanking, getPersistedRankingFn getPersistedRanking) []domain.Event {
+func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventByDateFn getEventsByDate, getSonnyMooreRankingFn getSonnyMooreRanking, getPersistedRankingFn getPersistedRanking, homeAdvantage float64) []domain.Event {
 	events := getEventByDateFn(eventDate)
 
 	sonnyMooreRanking := getSonnyMooreRankingFn()
@@ -44,17 +46,23 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 	pastRanking := getPersistedRankingFn(pastEvents)
 	currentTime := time.Now()
 
-	var awayRanking, homeRanking float64
+	var awayRanking float64 = -999999
+	var homeRanking float64 = -999999
 	for index, event := range events {
 		if event.GameDate.Before(currentTime) {
-			awayRanking = pastRanking[event.ID].AwayRanking
-			homeRanking = pastRanking[event.ID].HomeRanking
+			if pastRanking[event.ID].HomeRanking != 0 {
+				awayRanking = pastRanking[event.ID].AwayRanking
+				homeRanking = pastRanking[event.ID].HomeRanking
+			}
 		} else {
 			awayRanking = sonnyMooreRanking[strings.ToUpper(events[index].AwayTeam.Name)]
 			homeRanking = sonnyMooreRanking[strings.ToUpper(events[index].HomeTeam.Name)]
 		}
 
-		homeOdds := awayRanking - homeRanking - sonnyMooreHomeAdvantage
+		var homeOdds float64 = -999999
+		if awayRanking != -999999 {
+			homeOdds = awayRanking - homeRanking - homeAdvantage
+		}
 
 		events[index].SonnyMooreRanking.AwayRanking = awayRanking
 		events[index].SonnyMooreRanking.HomeRanking = homeRanking

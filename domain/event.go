@@ -4,6 +4,24 @@ import (
 	"time"
 )
 
+// Events type
+type Events []Event
+
+// Len function
+func (events Events) Len() int {
+	return len(events)
+}
+
+// Less function
+func (events Events) Less(i, j int) bool {
+	return events[i].GameDate.Before(events[j].GameDate)
+}
+
+// Swap function
+func (events Events) Swap(i, j int) {
+	events[i], events[j] = events[j], events[i]
+}
+
 // Event struct
 type Event struct {
 	ID                int       `json:"id"`

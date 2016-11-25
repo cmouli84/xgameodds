@@ -11,7 +11,7 @@ import (
 func NewHTTPClient() *HTTPClientHandler {
 	httpClientHandler := &HTTPClientHandler{}
 	client := http.Client{
-		Timeout: time.Second * 10,
+		Timeout: time.Second * 20,
 		Transport: &http.Transport{
 			DisableKeepAlives: true,
 		},
@@ -36,14 +36,14 @@ func (httpClientHandler *HTTPClientHandler) GetHTTPResponse(url string) []byte {
 	resp, err := httpClientHandler.Client.Get(url)
 	if err != nil {
 		fmt.Println(err)
-		return []byte{}
+		panic(err)
 	}
 	defer resp.Body.Close()
 
 	response, ioerr := ioutil.ReadAll(resp.Body)
 	if ioerr != nil {
 		fmt.Println(ioerr)
-		return []byte{}
+		panic(err)
 	}
 	return response
 }
