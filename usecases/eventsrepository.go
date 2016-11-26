@@ -12,11 +12,14 @@ import (
 // EventsInteractor struct
 type EventsInteractor struct {
 	EventsRepository     domain.EventsRepository
+	TeamRepository       domain.TeamRepository
 	SonnyMooreRepository domain.SonnyMooreRepository
 	DynamoDbRepository   domain.DynamoDbRepository
 }
 
 type getEventsByDate func(eventDate string) []domain.Event
+
+type getTeamStats func() map[string][]domain.TeamStat
 
 type getSonnyMooreRanking func() map[string]float64
 
@@ -28,17 +31,21 @@ const sonnyMooreNcaabHomeAdvantage float64 = 3.25
 
 // GetNflEventsByDate function
 func (interactor *EventsInteractor) GetNflEventsByDate(eventDate string) []domain.Event {
-	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNflEventsByDate, interactor.SonnyMooreRepository.GetSonnyMooreNflRanking, interactor.DynamoDbRepository.GetNflPersistedRanking, sonnyMooreNflHomeAdvantage)
+	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNflEventsByDate, interactor.TeamRepository.GetNflTeamStats, interactor.SonnyMooreRepository.GetSonnyMooreNflRanking, interactor.DynamoDbRepository.GetNflPersistedRanking, sonnyMooreNflHomeAdvantage)
 }
 
 // GetNcaabEventsByDate function
 func (interactor *EventsInteractor) GetNcaabEventsByDate(eventDate string) []domain.Event {
-	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNcaabEventsByDate, interactor.SonnyMooreRepository.GetSonnyMooreNcaabRanking, interactor.DynamoDbRepository.GetNcaabPersistedRanking, sonnyMooreNcaabHomeAdvantage)
+	return interactor.getEventsByDate(eventDate, interactor.EventsRepository.GetNcaabEventsByDate, interactor.TeamRepository.GetNcaabTeamStats, interactor.SonnyMooreRepository.GetSonnyMooreNcaabRanking, interactor.DynamoDbRepository.GetNcaabPersistedRanking, sonnyMooreNcaabHomeAdvantage)
 }
 
 // getEventsByDate function
-func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventByDateFn getEventsByDate, getSonnyMooreRankingFn getSonnyMooreRanking, getPersistedRankingFn getPersistedRanking, homeAdvantage float64) []domain.Event {
+func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventByDateFn getEventsByDate, getTeamStatsFn getTeamStats, getSonnyMooreRankingFn getSonnyMooreRanking, getPersistedRankingFn getPersistedRanking, homeAdvantage float64) []domain.Event {
 	events := getEventByDateFn(eventDate)
+	teamStats := make(map[string][]domain.TeamStat)
+	if len(events) > 0 {
+		teamStats = getTeamStatsFn()
+	}
 
 	sonnyMooreRanking := getSonnyMooreRankingFn()
 
@@ -57,6 +64,11 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 		} else {
 			awayRanking = sonnyMooreRanking[strings.ToUpper(events[index].AwayTeam.Name)]
 			homeRanking = sonnyMooreRanking[strings.ToUpper(events[index].HomeTeam.Name)]
+		}
+
+		if (event.GameDate.Year() == currentTime.Year()) && (event.GameDate.YearDay() == currentTime.YearDay()) {
+			events[index].HomeRecord.Events = teamStats[event.HomeTeam.Name]
+			events[index].AwayRecord.Events = teamStats[event.AwayTeam.Name]
 		}
 
 		var homeOdds float64 = -999999

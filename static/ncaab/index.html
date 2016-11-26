@@ -68,7 +68,7 @@
 
       $scope.getSonnyMooreStatusClass = function(pick) {
     	  var sonnyMooreRatingDiff = $scope.getSonnyMooreRatingDiff(pick);
-    	  if (sonnyMooreRatingDiff === "N/A" || pick.westgateCurrentPointSpread === -999999)
+    	  if (sonnyMooreRatingDiff === "N/A" || pick.westgateHomeOdds === -999999)
    		  {
     		  return "";
    		  }
@@ -314,7 +314,7 @@
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="pick.homeRecord != null">
             <table class="table">
               <tr>
-                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.homeTeamLogoUrl}}" />{{pick.homeTeam.name}}</th>
+                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.homeTeam.logoUrl}}" />{{pick.homeTeam.name}}</th>
         	  </tr>
               <tr ng-if="pick.homeRecord.events.length > 0">
                 <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Opponent</th>
@@ -341,7 +341,7 @@
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="pick.awayRecord != null">
             <table class="table">
               <tr>
-                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.awayTeamLogoUrl}}" />{{pick.awayTeam.name}}</th>
+                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.awayTeam.logoUrl}}" />{{pick.awayTeam.name}}</th>
         	  </tr>
               <tr ng-if="pick.awayRecord.events.length > 0">
                 <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Opponent</th>
