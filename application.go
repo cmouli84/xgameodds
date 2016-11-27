@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"time"
 
@@ -58,5 +59,10 @@ func main() {
 	r.HandleFunc("/api/ncaab/events/{eventdate}", webapiHandler.GetNcaabEventsByDate).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 
-	http.ListenAndServe(":8181", r)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
+
+	http.ListenAndServe(":"+port, r)
 }
