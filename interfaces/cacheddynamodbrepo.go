@@ -1,7 +1,6 @@
 package interfaces
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/cmouli84/xgameodds/domain"
@@ -53,22 +52,22 @@ func (cachedPersistedRankingRepo *CachedPersistedRankingRepo) getPersistedRankin
 			notFoundEventIds = append(notFoundEventIds, eventID)
 		}
 	}
-	fmt.Println("From Cache", persistedRankingMap)
+	//fmt.Println("From Cache", persistedRankingMap)
 
 	if len(notFoundEventIds) > 0 {
 		persistedRankingRepo := getPersistedRankingFn(notFoundEventIds)
-		fmt.Println("From Repo", persistedRankingRepo)
+		//fmt.Println("From Repo", persistedRankingRepo)
 
 		for k, v := range persistedRankingRepo {
 			persistedRankingMap[k] = v
 			dataCache.Set(strconv.Itoa(k), persistedRankingRepo[k], cache.DefaultExpiration)
 
-			persistedRankingInterface, found = dataCache.Get(strconv.Itoa(k))
-			fmt.Println(k, persistedRankingInterface.(domain.PersistedRanking).HomeRanking, persistedRankingInterface.(domain.PersistedRanking).AwayRanking)
+			//persistedRankingInterface, found = dataCache.Get(strconv.Itoa(k))
+			//fmt.Println(k, persistedRankingInterface.(domain.PersistedRanking).HomeRanking, persistedRankingInterface.(domain.PersistedRanking).AwayRanking)
 		}
 	}
 
-	fmt.Println("Consolidated", persistedRankingMap)
+	//fmt.Println("Consolidated", persistedRankingMap)
 
 	return persistedRankingMap
 }
