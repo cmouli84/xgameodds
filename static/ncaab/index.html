@@ -44,9 +44,9 @@
       
       $scope.getSonnyMoorePowerRanking  = function(pick) {
     	  return "("
-    	  		+ (pick.sonnyMooreRanking.awayRanking === -999999 ? "N/A" : pick.sonnyMooreRanking.awayRanking)
+    	  		+ (pick.sonnyMooreRanking.awayRanking === -999999 || pick.sonnyMooreRanking.homeRanking === -999999 ? "N/A" : pick.sonnyMooreRanking.awayRanking)
     	  		+ " - "
-    	  		+ (pick.sonnyMooreRanking.homeRanking === -999999 ? "N/A" : pick.sonnyMooreRanking.homeRanking)
+    	  		+ (pick.sonnyMooreRanking.homeRanking === -999999 || pick.sonnyMooreRanking.awayRanking === -999999 ? "N/A" : pick.sonnyMooreRanking.homeRanking)
     	  		+ ")";
       }
 

@@ -53,11 +53,11 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 	pastRanking := getPersistedRankingFn(pastEvents)
 	currentTime := time.Now()
 
-	var awayRanking float64 = -999999
-	var homeRanking float64 = -999999
 	for index, event := range events {
+		var awayRanking float64 = -999999
+		var homeRanking float64 = -999999
 		if event.GameDate.Before(currentTime) {
-			if pastRanking[event.ID].HomeRanking != 0 {
+			if pastRanking[event.ID].HomeRanking != 0 && pastRanking[event.ID].AwayRanking != 0 {
 				awayRanking = pastRanking[event.ID].AwayRanking
 				homeRanking = pastRanking[event.ID].HomeRanking
 			}
@@ -72,7 +72,7 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 		}
 
 		var homeOdds float64 = -999999
-		if awayRanking != -999999 {
+		if awayRanking != -999999 && homeRanking != -999999 {
 			homeOdds = awayRanking - homeRanking - homeAdvantage
 		}
 
