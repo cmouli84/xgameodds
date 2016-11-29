@@ -67,12 +67,10 @@
       }
 
       $scope.getSonnyMooreStatusClass = function(pick) {
-    	  var sonnyMooreRatingDiff = $scope.getSonnyMooreRatingDiff(pick);
-    	  if (sonnyMooreRatingDiff === "N/A" || pick.westgateHomeOdds === -999999)
+    	  if (pick.sonnyMooreRanking.sonnyMooreOdds === -999999 || pick.westgateHomeOdds === -999999)
    		  {
     		  return "";
    		  }
-
     	  var dtCurrentDate = new Date();
     	  var dtGameDate = new Date(pick.gameDate);
     	  dtGameDate.setFullYear((dtGameDate.getMonth()>6 && dtCurrentDate.getMonth()>6) || (dtGameDate.getMonth()<=6 && dtCurrentDate.getMonth()<=6) 
@@ -80,15 +78,15 @@
     	  dtGameDate.setHours(dtGameDate.getHours() + 3);
     	  if (dtGameDate < dtCurrentDate)
    		  {
-    		  if ((((pick.awayTeamScore - pick.homeTeamScore) > pick.westgateHomeOdds) && (sonnyMooreRatingDiff > pick.westgateHomeOdds)) 
-    				  || (((pick.awayTeamScore - pick.homeTeamScore) < pick.westgateHomeOdds) && (sonnyMooreRatingDiff < pick.westgateHomeOdds))) 
+    		  if ((((pick.awayTeamScore - pick.homeTeamScore) > pick.westgateHomeOdds) && (pick.sonnyMooreRanking.sonnyMooreOdds > pick.westgateHomeOdds)) 
+    				  || (((pick.awayTeamScore - pick.homeTeamScore) < pick.westgateHomeOdds) && (pick.sonnyMooreRanking.sonnyMooreOdds < pick.westgateHomeOdds))) 
    			  {
    			  		return "positive";
    			  }
-			  return "negative";
+			    return "negative";
    		  }
     	  
-		  return "";
+		    return "";
       }
       
       $scope.getWestGateSpreadStatusClass = function(pick) {
