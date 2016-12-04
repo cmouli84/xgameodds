@@ -88,6 +88,10 @@ func (dynamodbHandler *DynamoDbHandler) getPersistedRanking(eventIds []int, tabl
 	persistedRankingMap := make(map[int]domain.PersistedRanking)
 
 	for _, item := range response.Responses[tableName] {
+		if (item[homeTeamRankingField] == nil) || (item[awayTeamRankingField] == nil) {
+			continue
+		}
+
 		eventID, _ := strconv.Atoi(*item[eventIDField].N)
 		persistedRanking := domain.PersistedRanking{}
 		persistedRanking.HomeRanking, _ = strconv.ParseFloat(*item[homeTeamRankingField].N, 64)
