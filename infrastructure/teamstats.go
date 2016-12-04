@@ -63,7 +63,7 @@ func (teamStatsHandler *TeamStatsHandler) getTeamStats(tableName string) []Event
 	eventStats := make([]EventStat, len(resp.Items))
 
 	for index, item := range resp.Items {
-		if (item["HomeScore"] == nil) && (item["AwayScore"] == nil) {
+		if (item["HomeScore"] == nil) || (item["AwayScore"] == nil) || (item["HomeTeamName"] == nil) {
 			continue
 		}
 		eventStats[index].HomeTeamName = *item["HomeTeamName"].S
