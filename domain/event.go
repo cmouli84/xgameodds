@@ -36,8 +36,9 @@ type Event struct {
 		AwayRanking    float64 `json:"awayRanking"`
 		SonnyMooreOdds float64 `json:"sonnyMooreOdds"`
 	} `json:"sonnyMooreRanking"`
-	HomeRecord TeamStats `json:"homeRecord"`
-	AwayRecord TeamStats `json:"awayRecord"`
+	HomeRecord TeamStats       `json:"homeRecord"`
+	AwayRecord TeamStats       `json:"awayRecord"`
+	TeamTrends EventTeamTrends `json:"teamTrends"`
 }
 
 // Team struct
@@ -68,6 +69,35 @@ type TeamStat struct {
 // TeamStats struct
 type TeamStats struct {
 	Events []TeamStat `json:"events"`
+}
+
+// TrendValue struct
+type TrendValue struct {
+	HomeValue string `json:"homeValue"`
+	AwayValue string `json:"awayValue"`
+}
+
+// TeamTrendSet struct
+type TeamTrendSet struct {
+	All                TrendValue `json:"all"`
+	Home               TrendValue `json:"home"`
+	Away               TrendValue `json:"away"`
+	Favorite           TrendValue `json:"favorite"`
+	HomeFavorite       TrendValue `json:"homeFavorite"`
+	AwayFavorite       TrendValue `json:"awayFavorite"`
+	Underdog           TrendValue `json:"underdog"`
+	HomeUnderdog       TrendValue `json:"homeUnderdog"`
+	AwayUnderdog       TrendValue `json:"awayUnderdog"`
+	ConferenceGames    TrendValue `json:"conferenceGames"`
+	NonConferenceGames TrendValue `json:"nonConferenceGames"`
+	DivisionGames      TrendValue `json:"divisionGames"`
+	NonDivisionGames   TrendValue `json:"nonDivisionGames"`
+}
+
+// EventTeamTrends struct
+type EventTeamTrends struct {
+	ATS       TeamTrendSet `json:"ats"`
+	OverUnder TeamTrendSet `json:"ou"`
 }
 
 // EventsRepository interface

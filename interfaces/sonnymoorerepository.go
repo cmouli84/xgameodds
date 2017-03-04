@@ -12,7 +12,7 @@ type SonnyMooreInterface interface {
 
 // TeamnameMappingInterface interface
 type TeamnameMappingInterface interface {
-	GetNcaabTeamNames() map[string]string
+	GetNcaabTeamNames() (map[string]string, map[string]string)
 }
 
 // SonnyMooreRepo struct
@@ -37,7 +37,7 @@ func (sonnyMooreRepo *SonnyMooreRepo) GetSonnyMooreNflRanking() map[string]float
 // GetSonnyMooreNcaabRanking function
 func (sonnyMooreRepo *SonnyMooreRepo) GetSonnyMooreNcaabRanking() map[string]float64 {
 	rankingMap := sonnyMooreRepo.sonnyMooreInterface.GetSonnyMooreNcaabRanking()
-	teamMap := sonnyMooreRepo.teamnameMappingInterface.GetNcaabTeamNames()
+	teamMap, _ := sonnyMooreRepo.teamnameMappingInterface.GetNcaabTeamNames()
 	scoreAPIRankingMap := make(map[string]float64)
 
 	for k, v := range rankingMap {

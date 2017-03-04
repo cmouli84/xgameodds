@@ -13,6 +13,8 @@ const ncaabSonnyMooreTeamName = "SonnyMooreTeamName"
 
 const ncaabScoreAPITeamName = "ScoreApiTeamName"
 
+const ncaabTeamTrendTeamName = "TeamTrendTeamName"
+
 // TeamnameDbHandler struct
 type TeamnameDbHandler struct {
 	dynamodbClient *dynamodb.DynamoDB
@@ -25,7 +27,7 @@ func NewTeamnameDbHandler(dynamodbClient *dynamodb.DynamoDB) *TeamnameDbHandler 
 }
 
 // GetNcaabTeamNames function
-func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() map[string]string {
+func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() (map[string]string, map[string]string) {
 	params := &dynamodb.ScanInput{
 		TableName: aws.String(ncaabScoreAPITeamTableName),
 		AttributesToGet: []*string{
@@ -36,18 +38,21 @@ func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() map[string]strin
 
 	resp, dynamoerr := teamnameDbHandler.dynamodbClient.Scan(params)
 
-	teamMap := make(map[string]string)
+	sonnyTeamMap := make(map[string]string)
+	teamTrendMap := make(map[string]string)
 	if dynamoerr != nil {
 		fmt.Println(dynamoerr.Error())
-		return teamMap
+		return sonnyTeamMap, teamTrendMap
 	}
 
 	for _, item := range resp.Items {
 		sonnyMooreTeamName := item[ncaabSonnyMooreTeamName].S
 		scoreAPITeamName := item[ncaabScoreAPITeamName].S
+		teamTrendTeamName := item[ncaabTeamTrendTeamName].S
 
-		teamMap[*sonnyMooreTeamName] = *scoreAPITeamName
+		sonnyTeamMap[*sonnyMooreTeamName] = *scoreAPITeamName
+		teamTrendMap[*teamTrendTeamName] = *scoreAPITeamName
 	}
 
-	return teamMap
+	return sonnyTeamMap, teamTrendMap
 }
