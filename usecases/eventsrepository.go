@@ -79,7 +79,7 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 
 		var homeOdds float64 = -999999
 		if awayRanking != -999999 && homeRanking != -999999 {
-			homeOdds = awayRanking - homeRanking - homeAdvantage
+			homeOdds = awayRanking - homeRanking// - homeAdvantage
 		}
 
 		events[index].SonnyMooreRanking.AwayRanking = awayRanking
