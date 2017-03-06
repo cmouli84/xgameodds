@@ -308,34 +308,159 @@
         <div class="divPadding col-lg-3 col-md-3 col-sm-3 col-xs-3 text-centeralign"><br />
           {{getGameScore(pick)}}
         </div>
-        <div class="expandedRow col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="(pick.homeRecord == null && pick.awayRecord == null) || !pick.expanded ">
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="pick.homeRecord != null">
+
+        <div class="expandedRow col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="pick.teamTrends == null || !pick.expanded ">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <table class="table">
               <tr>
-                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.homeTeam.logoUrl}}" />{{pick.homeTeam.name}}</th>
-        	  </tr>
-              <tr ng-if="pick.homeRecord.events.length > 0">
-                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Opponent</th>
-                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">H/A</th>
-                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Odds</th>
-                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Result</th>
+                <th style="text-align: center; border-top: 0px"><image ng-src="{{pick.awayTeam.logoUrl}}" /></th>
+                <th style="text-align: center; border-top: 0px">ATS</th>
+                <th style="text-align: center; border-top: 0px"><image ng-src="{{pick.homeTeam.logoUrl}}" /></th>
+        	    </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.all.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">All</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.all.homeValue}}</td>
               </tr>
-              <tr ng-repeat="event in pick.homeRecord.events">
-                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-        	      {{event.opponentTeamName}}
-        	    </td>
-                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-        	      {{getHomeOrAway(event)}}
-        	    </td>
-                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-        	      {{getWestGatePointSpread(event.westgateHomeOdds)}}
-        	    </td>
-                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-        	      {{getResult(event)}}
-        	    </td>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.home.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Home</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.home.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.away.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Away</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.away.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.favorite.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Favorite</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.favorite.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.homeFavorite.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Home Favorite</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.homeFavorite.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.awayFavorite.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Away Favorite</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.awayFavorite.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.underdog.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Underdog</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.underdog.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.homeUnderdog.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Home Underdog</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.homeUnderdog.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.awayUnderdog.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Away Underdog</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.awayUnderdog.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.conferenceGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Conference Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.conferenceGames.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.nonConferenceGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Non-Conference Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.nonConferenceGames.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.divisionGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Division Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.divisionGames.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.nonDivisionGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Non-Division Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ats.nonDivisionGames.homeValue}}</td>
               </tr>
             </table>
           </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <table class="table">
+              <tr>
+                <th style="text-align: center; border-top: 0px"><image ng-src="{{pick.awayTeam.logoUrl}}" /></th>
+                <th style="text-align: center; border-top: 0px">Over/Under</th>
+                <th style="text-align: center; border-top: 0px"><image ng-src="{{pick.homeTeam.logoUrl}}" /></th>
+        	  </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.all.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">All</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.all.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.home.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Home</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.home.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.away.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Away</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.away.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.favorite.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Favorite</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.favorite.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.homeFavorite.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Home Favorite</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.homeFavorite.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.awayFavorite.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Away Favorite</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.awayFavorite.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.underdog.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Underdog</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.underdog.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.homeUnderdog.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Home Underdog</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.homeUnderdog.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.awayUnderdog.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Away Underdog</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.awayUnderdog.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.conferenceGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Conference Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.conferenceGames.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.nonConferenceGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Non-Conference Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.nonConferenceGames.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.divisionGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Division Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.divisionGames.homeValue}}</td>
+              </tr>
+              <tr style="text-align: center;">
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.nonDivisionGames.awayValue}}</td>
+                <td style="text-align: center;" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Non-Division Games</td>
+                <td class="col-lg-3 col-md-3 col-sm-3 col-xs-3">{{pick.teamTrends.ou.nonDivisionGames.homeValue}}</td>
+              </tr>
+            </table>
+          </div>
+        </div> 
+
+        <div class="expandedRow col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="(pick.homeRecord == null && pick.awayRecord == null) || !pick.expanded ">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="pick.awayRecord != null">
             <table class="table">
               <tr>
@@ -363,8 +488,35 @@
               </tr>
               </table>
             </div>
-          </div> 
-        </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="pick.homeRecord != null">
+            <table class="table">
+              <tr>
+                <th colspan="4" style="text-align: center; border-top: 0px"><image ng-src="{{pick.homeTeam.logoUrl}}" />{{pick.homeTeam.name}}</th>
+        	  </tr>
+              <tr ng-if="pick.homeRecord.events.length > 0">
+                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Opponent</th>
+                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">H/A</th>
+                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Odds</th>
+                <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Result</th>
+              </tr>
+              <tr ng-repeat="event in pick.homeRecord.events">
+                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        	      {{event.opponentTeamName}}
+        	    </td>
+                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        	      {{getHomeOrAway(event)}}
+        	    </td>
+                <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        	      {{getWestGatePointSpread(event.westgateHomeOdds)}}
+        	    </td>
+                <td class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        	      {{getResult(event)}}
+        	    </td>
+              </tr>
+            </table>
+          </div>
+        </div> 
+      </div>
     </div> 
   </div>
   <script type='text/javascript'>

@@ -91,13 +91,16 @@ func getTrend(url, trendType, situation string, teamTrends *domain.TeamTrends, w
 	}
 
 	doc.Find("table").First().Find("tbody tr").Each(func(i int, row *goquery.Selection) {
-		var teamName, trendValue string
+		var teamName, trendValue, underValue string
 		row.Find("td").Each(func(j int, col *goquery.Selection) {
 			if j == 0 {
 				teamName = col.Find("a").Text()
 			}
 			if j == 2 {
 				trendValue = col.Text()
+			}
+			if j == 3 {
+				underValue = col.Text()
 			}
 		})
 
@@ -113,6 +116,7 @@ func getTrend(url, trendType, situation string, teamTrends *domain.TeamTrends, w
 			situationType = (*teamTrends)[teamName].Ats
 		} else {
 			situationType = (*teamTrends)[teamName].OverUnder
+			trendValue += "/" + underValue
 		}
 
 		switch situation {
