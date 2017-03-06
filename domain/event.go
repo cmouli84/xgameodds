@@ -111,3 +111,9 @@ type TeamRepository interface {
 	GetNflTeamStats() map[string][]TeamStat
 	GetNcaabTeamStats() map[string][]TeamStat
 }
+
+// TeamTrendsRepository interface
+type TeamTrendsRepository interface {
+	GetNflTeamTrends() TeamTrends
+	GetNcaabTeamTrends() TeamTrends
+}

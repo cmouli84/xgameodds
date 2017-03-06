@@ -33,6 +33,7 @@ func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() (map[string]stri
 		AttributesToGet: []*string{
 			aws.String(ncaabSonnyMooreTeamName),
 			aws.String(ncaabScoreAPITeamName),
+			aws.String(ncaabTeamTrendTeamName),
 		},
 	}
 

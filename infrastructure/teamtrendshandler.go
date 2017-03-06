@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/cmouli84/xgameodds/domain"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -47,18 +49,18 @@ func NewTeamTrendsHandler() *TeamTrendsHandler {
 }
 
 // GetNflTeamTrends function
-func (handler *TeamTrendsHandler) GetNflTeamTrends() TeamTrends {
+func (handler *TeamTrendsHandler) GetNflTeamTrends() domain.TeamTrends {
 	return handler.getTeamTrends(atsTrendsNflBaseURL, overUnderNflBaseURL)
 }
 
 // GetNcaabTeamTrends function
-func (handler *TeamTrendsHandler) GetNcaabTeamTrends() TeamTrends {
+func (handler *TeamTrendsHandler) GetNcaabTeamTrends() domain.TeamTrends {
 	return handler.getTeamTrends(atsTrendsNcaabBaseURL, overUnderNcaabBaseURL)
 }
 
 // getTeamTrends function
-func (handler *TeamTrendsHandler) getTeamTrends(atsTrendsBaseURL, overUnderBaseURL string) TeamTrends {
-	teamTrends := TeamTrends(make(map[string]Trend))
+func (handler *TeamTrendsHandler) getTeamTrends(atsTrendsBaseURL, overUnderBaseURL string) domain.TeamTrends {
+	teamTrends := domain.TeamTrends(make(map[string]domain.Trend))
 
 	//line below is my question
 	wg := sync.WaitGroup{}
@@ -79,9 +81,9 @@ func (handler *TeamTrendsHandler) getTeamTrends(atsTrendsBaseURL, overUnderBaseU
 }
 
 // getTrend function
-func getTrend(url, trendType, situation string, teamTrends *TeamTrends, wg *sync.WaitGroup) {
+func getTrend(url, trendType, situation string, teamTrends *domain.TeamTrends, wg *sync.WaitGroup) {
 	defer wg.Done()
-	fmt.Println(url)
+	//fmt.Println(url)
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		fmt.Println(err)
@@ -99,9 +101,12 @@ func getTrend(url, trendType, situation string, teamTrends *TeamTrends, wg *sync
 			}
 		})
 
-		var situationType *Situation
+		var situationType *domain.Situation
 		if _, ok := (*teamTrends)[teamName]; !ok {
-			(*teamTrends)[teamName] = Trend{&Situation{}, &Situation{}}
+			teamTrend := domain.Trend{}
+			teamTrend.Ats = &domain.Situation{}
+			teamTrend.OverUnder = &domain.Situation{}
+			(*teamTrends)[teamName] = teamTrend
 		}
 
 		if trendType == "ATS" {

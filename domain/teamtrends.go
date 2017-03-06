@@ -1,4 +1,4 @@
-package infrastructure
+package domain
 
 // TeamTrends map
 type TeamTrends map[string]Trend

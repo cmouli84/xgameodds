@@ -1,11 +1,11 @@
 package interfaces
 
-import "github.com/cmouli84/xgameodds/infrastructure"
+import "github.com/cmouli84/xgameodds/domain"
 
 // TeamTrendsInterface interface
 type TeamTrendsInterface interface {
-	GetNflTeamTrends() infrastructure.TeamTrends
-	GetNcaabTeamTrends() infrastructure.TeamTrends
+	GetNflTeamTrends() domain.TeamTrends
+	GetNcaabTeamTrends() domain.TeamTrends
 }
 
 // TeamTrendsRepo struct
@@ -14,8 +14,8 @@ type TeamTrendsRepo struct {
 	teamnameMappingInterface TeamnameMappingInterface
 }
 
-// NewTeamTrendsInterface function
-func NewTeamTrendsInterface(teamTrendsInterface TeamTrendsInterface, teamnameMappingInterface TeamnameMappingInterface) *TeamTrendsRepo {
+// NewTeamTrendsRepo function
+func NewTeamTrendsRepo(teamTrendsInterface TeamTrendsInterface, teamnameMappingInterface TeamnameMappingInterface) *TeamTrendsRepo {
 	teamTrendsRepo := new(TeamTrendsRepo)
 	teamTrendsRepo.teamTrendsInterface = teamTrendsInterface
 	teamTrendsRepo.teamnameMappingInterface = teamnameMappingInterface
@@ -23,16 +23,16 @@ func NewTeamTrendsInterface(teamTrendsInterface TeamTrendsInterface, teamnameMap
 }
 
 // GetNflTeamTrends function
-func (teamTrendsRepo *TeamTrendsRepo) GetNflTeamTrends() infrastructure.TeamTrends {
+func (teamTrendsRepo *TeamTrendsRepo) GetNflTeamTrends() domain.TeamTrends {
 	return teamTrendsRepo.teamTrendsInterface.GetNflTeamTrends()
 }
 
 // GetNcaabTeamTrends function
-func (teamTrendsRepo *TeamTrendsRepo) GetNcaabTeamTrends() infrastructure.TeamTrends {
+func (teamTrendsRepo *TeamTrendsRepo) GetNcaabTeamTrends() domain.TeamTrends {
 	teamTrendMap := teamTrendsRepo.teamTrendsInterface.GetNcaabTeamTrends()
 	_, teamMap := teamTrendsRepo.teamnameMappingInterface.GetNcaabTeamNames()
 
-	result := infrastructure.TeamTrends(make(map[string]infrastructure.Trend))
+	result := domain.TeamTrends(make(map[string]domain.Trend))
 	for k, v := range teamTrendMap {
 		result[teamMap[k]] = v
 	}
