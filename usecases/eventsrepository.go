@@ -71,7 +71,7 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 			homeRanking = sonnyMooreRanking[strings.ToUpper(events[index].HomeTeam.Name)]
 		}
 
-		if (event.GameDate.Year() == currentTime.Year()) && (event.GameDate.YearDay() == currentTime.YearDay()) {
+		if (event.GameDate.Year() > currentTime.Year()) || ((event.GameDate.Year() == currentTime.Year()) && (event.GameDate.YearDay() >= currentTime.YearDay())) {
 			events[index].HomeRecord.Events = teamStats[event.HomeTeam.Name]
 			events[index].AwayRecord.Events = teamStats[event.AwayTeam.Name]
 			events[index].TeamTrends = getTeamTrendsByTeam(teamTrends, event.HomeTeam.Name, event.AwayTeam.Name)
@@ -79,7 +79,7 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 
 		var homeOdds float64 = -999999
 		if awayRanking != -999999 && homeRanking != -999999 {
-			homeOdds = awayRanking - homeRanking// - homeAdvantage
+			homeOdds = awayRanking - homeRanking // - homeAdvantage
 		}
 
 		events[index].SonnyMooreRanking.AwayRanking = awayRanking
@@ -117,7 +117,7 @@ func getPastEvents(events []domain.Event) []int {
 
 func getTeamTrendsByTeam(teamTrends domain.TeamTrends, homeTeamName, awayTeamName string) domain.EventTeamTrends {
 	eventTeamTrends := domain.EventTeamTrends{}
-	
+
 	if homeTeamTrend, ok := teamTrends[homeTeamName]; ok {
 		eventTeamTrends.ATS.All.HomeValue = getTeamTrendValue(homeTeamTrend.Ats.All)
 		eventTeamTrends.ATS.Away.HomeValue = getTeamTrendValue(homeTeamTrend.Ats.Away)

@@ -59,11 +59,11 @@
       }
       
       $scope.getGameRowClass = function() {
-    	  return ($scope.currentDate == $scope.selectedDate) ? "pointerRow " : "";
+    	  return ($scope.currentDate <= $scope.selectedDate) ? "pointerRow " : "";
       }
       
       $scope.getExpandClass = function(pick) {
-    	  return (pick.expanded ? " customicon-minus" : " customicon-plus") + (($scope.currentDate == $scope.selectedDate) ? "" : " customicon-hide");
+    	  return (pick.expanded ? " customicon-minus" : " customicon-plus") + (($scope.currentDate <= $scope.selectedDate) ? "" : " customicon-hide");
       }
 
       $scope.getSonnyMooreStatusClass = function(pick) {
