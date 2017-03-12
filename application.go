@@ -37,20 +37,22 @@ func main() {
 	teamTrendsRepository := interfaces.NewTeamTrendsRepo(teamTrendsHandler, cachedTeamNameMap)
 
 	nflScoreAPICache := cache.New(time.Minute*15, time.Minute*1)
-	nflSonnyMooreCache := cache.New(time.Hour*6, time.Minute*1)
+	nflSonnyMooreCache := cache.New(time.Hour*2, time.Minute*1)
 	nflDynamodbRepositoryCache := cache.New(time.Hour*24*7*30, time.Minute*1)
 	nflTeamStatsCache := cache.New(time.Hour*12, time.Minute*1)
+        nflTeamTrendsCache := cache.New(time.Hour*2, time.Minute*1)
 
 	ncaabScoreAPICache := cache.New(time.Minute*15, time.Minute*1)
-	ncaabSonnyMooreCache := cache.New(time.Hour*6, time.Minute*1)
+	ncaabSonnyMooreCache := cache.New(time.Hour*2, time.Minute*1)
 	ncaabDynamodbRepositoryCache := cache.New(time.Hour*24*7*30, time.Minute*1)
 	ncaabTeamStatsCache := cache.New(time.Hour*12, time.Minute*1)
+        ncaabTeamTrendsCache := cache.New(time.Hour*2, time.Minute*1)
 
 	cachedScoreAPIRepo := interfaces.NewCachedScoreAPIRepo(scoreAPIRepository, nflScoreAPICache, ncaabScoreAPICache)
 	cachedScoreAPITeamRepo := interfaces.NewCachedScoreAPITeamRepo(teamStatsRepository, nflTeamStatsCache, ncaabTeamStatsCache)
 	cachedSonnyMooreRepo := interfaces.NewCachedSonnyMooreRepo(sonnyMooreRepository, nflSonnyMooreCache, ncaabSonnyMooreCache)
 	cachedDynamoDbRepo := interfaces.NewCachedPersistedRankingRepo(dynamodbRepository, nflDynamodbRepositoryCache, ncaabDynamodbRepositoryCache)
-	cachedTeamTrendsRepo := interfaces.NewCachedTeamTrendRepo(teamTrendsRepository, nflTeamStatsCache, ncaabTeamStatsCache)
+	cachedTeamTrendsRepo := interfaces.NewCachedTeamTrendRepo(teamTrendsRepository, nflTeamTrendsCache, ncaabTeamTrendsCache)
 
 	eventsInteractor := new(usecases.EventsInteractor)
 	eventsInteractor.EventsRepository = cachedScoreAPIRepo
