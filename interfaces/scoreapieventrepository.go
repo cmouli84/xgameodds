@@ -57,11 +57,13 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 	parsedStartDate = parsedStartDate.UTC()
 
 	parsedEndDate := parsedStartDate.Add(time.Hour * 24)
+	modifiedParsedEndDate := parsedEndDate.Add(time.Hour * 24)
 
 	eventIds := make([]int, 0)
 	for _, season := range schedule.CurrentSeason {
 		if (season.StartDate.Before(parsedStartDate) && season.EndDate.After(parsedStartDate)) || season.StartDate.Equal(parsedStartDate) ||
-			(season.StartDate.Before(parsedEndDate) && season.EndDate.After(parsedEndDate)) || season.StartDate.Equal(parsedEndDate) {
+			(season.StartDate.Before(parsedEndDate) && season.EndDate.After(parsedEndDate)) || season.StartDate.Equal(parsedEndDate) ||
+			(season.StartDate.Before(modifiedParsedEndDate) && season.EndDate.After(modifiedParsedEndDate)) || season.StartDate.Equal(modifiedParsedEndDate) {
 			eventIds = append(eventIds, season.EventIds...)
 		}
 	}
