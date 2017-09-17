@@ -28,7 +28,7 @@ type getPersistedRanking func(eventIds []int) map[int]domain.PersistedRanking
 
 type getTeamTrends func() domain.TeamTrends
 
-const sonnyMooreNflHomeAdvantage float64 = 2
+const sonnyMooreNflHomeAdvantage float64 = 3.2
 
 const sonnyMooreNcaabHomeAdvantage float64 = 3.25
 
@@ -79,7 +79,7 @@ func (interactor *EventsInteractor) getEventsByDate(eventDate string, getEventBy
 
 		var homeOdds float64 = -999999
 		if awayRanking != -999999 && homeRanking != -999999 {
-			homeOdds = awayRanking - homeRanking // - homeAdvantage
+			homeOdds = awayRanking - homeRanking - homeAdvantage
 		}
 
 		events[index].SonnyMooreRanking.AwayRanking = awayRanking
