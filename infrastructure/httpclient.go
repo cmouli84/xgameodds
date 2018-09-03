@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"log"
 )
 
 // NewHTTPClient returns new Http client
@@ -33,6 +34,7 @@ type HTTPClientHandler struct {
 
 // GetHTTPResponse function
 func (httpClientHandler *HTTPClientHandler) GetHTTPResponse(url string) []byte {
+	startTime := time.Now()
 	resp, err := httpClientHandler.Client.Get(url)
 	if err != nil {
 		fmt.Println(err)
@@ -45,5 +47,6 @@ func (httpClientHandler *HTTPClientHandler) GetHTTPResponse(url string) []byte {
 		fmt.Println(ioerr)
 		panic(err)
 	}
+	log.Printf("Time taken for HTTP call %s: %d", url, time.Now().Sub(startTime)*time.Millisecond)
 	return response
 }

@@ -7,6 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"time"
+	"log"
 )
 
 // EventStat struct
@@ -42,6 +44,8 @@ func (teamStatsHandler *TeamStatsHandler) GetNflTeamStats() []EventStat {
 
 // getTeamStats function
 func (teamStatsHandler *TeamStatsHandler) getTeamStats(tableName string) []EventStat {
+	startTime := time.Now()
+
 	params := &dynamodb.ScanInput{
 		TableName: aws.String(tableName),
 		AttributesToGet: []*string{
@@ -73,6 +77,8 @@ func (teamStatsHandler *TeamStatsHandler) getTeamStats(tableName string) []Event
 		eventStats[index].EventDate = *item["EventDate"].S
 		eventStats[index].HomeOdds, _ = strconv.ParseFloat(*item["HomeOdds"].N, 64)
 	}
+
+	log.Printf("Time taken for Dynamo call GetTeamStats for %s: %d", tableName, time.Now().Sub(startTime) * time.Millisecond)
 
 	return eventStats
 }

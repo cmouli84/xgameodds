@@ -7,6 +7,8 @@ import (
 	"github.com/cmouli84/xgameodds/domain"
 
 	"github.com/PuerkitoBio/goquery"
+	"time"
+	"log"
 )
 
 // TeamTrendsHandler struct
@@ -60,6 +62,8 @@ func (handler *TeamTrendsHandler) GetNcaabTeamTrends() domain.TeamTrends {
 
 // getTeamTrends function
 func (handler *TeamTrendsHandler) getTeamTrends(atsTrendsBaseURL, overUnderBaseURL string) domain.TeamTrends {
+	startTime := time.Now()
+
 	teamTrends := domain.TeamTrends(make(map[string]domain.Trend))
 
 	//line below is my question
@@ -76,6 +80,8 @@ func (handler *TeamTrendsHandler) getTeamTrends(atsTrendsBaseURL, overUnderBaseU
 		wg.Add(1)
 		go getTrend(overUnderBaseURL+val, "OU", key, &teamTrends, &wg)
 	}
+
+	log.Printf("Time taken for GetTeamTrends for %s, %s: %d", atsTrendsBaseURL, overUnderBaseURL, time.Now().Sub(startTime) * time.Millisecond)
 
 	return teamTrends
 }

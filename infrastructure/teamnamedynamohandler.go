@@ -5,6 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"time"
+	"log"
 )
 
 const ncaabScoreAPITeamTableName = "ScoreApiTeams"
@@ -28,6 +30,8 @@ func NewTeamnameDbHandler(dynamodbClient *dynamodb.DynamoDB) *TeamnameDbHandler 
 
 // GetNcaabTeamNames function
 func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() (map[string]string, map[string]string) {
+	startTime := time.Now()
+
 	params := &dynamodb.ScanInput{
 		TableName: aws.String(ncaabScoreAPITeamTableName),
 		AttributesToGet: []*string{
@@ -54,6 +58,8 @@ func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() (map[string]stri
 		sonnyTeamMap[*sonnyMooreTeamName] = *scoreAPITeamName
 		teamTrendMap[*teamTrendTeamName] = *scoreAPITeamName
 	}
+
+	log.Printf("Time taken for Dynamo call %s: %d", "GetNcaabTeamNames", time.Now().Sub(startTime) * time.Millisecond)
 
 	return sonnyTeamMap, teamTrendMap
 }
