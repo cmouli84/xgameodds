@@ -81,7 +81,7 @@ func (handler *TeamTrendsHandler) getTeamTrends(atsTrendsBaseURL, overUnderBaseU
 		go getTrend(overUnderBaseURL+val, "OU", key, &teamTrends, &wg)
 	}
 
-	log.Printf("Time taken for GetTeamTrends for %s, %s: %d", atsTrendsBaseURL, overUnderBaseURL, time.Now().Sub(startTime) * time.Millisecond)
+	log.Printf("Time taken for GetTeamTrends for %s, %s: %d", atsTrendsBaseURL, overUnderBaseURL, time.Now().Sub(startTime) / time.Millisecond)
 
 	return teamTrends
 }

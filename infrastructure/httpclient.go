@@ -47,6 +47,6 @@ func (httpClientHandler *HTTPClientHandler) GetHTTPResponse(url string) []byte {
 		fmt.Println(ioerr)
 		panic(err)
 	}
-	log.Printf("Time taken for HTTP call %s: %d", url, time.Now().Sub(startTime)*time.Millisecond)
+	log.Printf("Time taken for HTTP call %s: %d", url, time.Now().Sub(startTime)/time.Millisecond)
 	return response
 }

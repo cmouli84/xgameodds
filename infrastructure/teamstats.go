@@ -78,7 +78,7 @@ func (teamStatsHandler *TeamStatsHandler) getTeamStats(tableName string) []Event
 		eventStats[index].HomeOdds, _ = strconv.ParseFloat(*item["HomeOdds"].N, 64)
 	}
 
-	log.Printf("Time taken for Dynamo call GetTeamStats for %s: %d", tableName, time.Now().Sub(startTime) * time.Millisecond)
+	log.Printf("Time taken for Dynamo call GetTeamStats for %s: %d", tableName, time.Now().Sub(startTime) / time.Millisecond)
 
 	return eventStats
 }

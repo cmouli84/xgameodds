@@ -59,7 +59,7 @@ func (teamnameDbHandler *TeamnameDbHandler) GetNcaabTeamNames() (map[string]stri
 		teamTrendMap[*teamTrendTeamName] = *scoreAPITeamName
 	}
 
-	log.Printf("Time taken for Dynamo call %s: %d", "GetNcaabTeamNames", time.Now().Sub(startTime) * time.Millisecond)
+	log.Printf("Time taken for Dynamo call %s: %d", "GetNcaabTeamNames", time.Now().Sub(startTime) / time.Millisecond)
 
 	return sonnyTeamMap, teamTrendMap
 }

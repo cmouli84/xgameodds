@@ -39,7 +39,7 @@ func (handler *WebAPIHandler) GetNflEventsByDate(res http.ResponseWriter, req *h
 
 	res.Header().Add("Content-Type", "application/json")
 	res.Write(eventsPayload)
-	log.Printf("Total Time taken for HTTP request %s/%s: %d", "nflevents", eventDate, time.Now().Sub(startTime)*time.Millisecond)
+	log.Printf("Total Time taken for HTTP request %s/%s: %d", "nflevents", eventDate, time.Now().Sub(startTime)/time.Millisecond)
 }
 
 // GetNcaabEventsByDate func
@@ -58,5 +58,5 @@ func (handler *WebAPIHandler) GetNcaabEventsByDate(res http.ResponseWriter, req 
 
 	res.Header().Add("Content-Type", "application/json")
 	res.Write(eventsPayload)
-	log.Printf("Total Time taken for HTTP request %s/%s: %d", "ncaabevents", eventDate, time.Now().Sub(startTime)*time.Millisecond)
+	log.Printf("Total Time taken for HTTP request %s/%s: %d", "ncaabevents", eventDate, time.Now().Sub(startTime)/time.Millisecond)
 }

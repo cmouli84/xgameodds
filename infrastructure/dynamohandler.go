@@ -10,6 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/cmouli84/xgameodds/domain"
+	"time"
+	"log"
 )
 
 const nflEventsTableName = "NflEvents"
@@ -59,6 +61,8 @@ func (dynamodbHandler *DynamoDbHandler) GetNcaabPersistedRanking(eventIds []int)
 
 // getPersistedRanking function
 func (dynamodbHandler *DynamoDbHandler) getPersistedRanking(eventIds []int, tableName string) map[int]domain.PersistedRanking {
+	startTime := time.Now()
+
 	keys := make([]map[string]*dynamodb.AttributeValue, 0)
 
 	for i := 0; i < len(eventIds); i++ {
@@ -99,6 +103,8 @@ func (dynamodbHandler *DynamoDbHandler) getPersistedRanking(eventIds []int, tabl
 
 		persistedRankingMap[eventID] = persistedRanking
 	}
+
+	log.Printf("Time taken for Dynamo call %s: %d", tableName, time.Now().Sub(startTime) / time.Millisecond)
 
 	return persistedRankingMap
 }
