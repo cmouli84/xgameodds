@@ -30,7 +30,7 @@ type getTeamTrends func() domain.TeamTrends
 
 const sonnyMooreNflHomeAdvantage float64 = 3.2
 
-const sonnyMooreNcaabHomeAdvantage float64 = 0//3.25
+const sonnyMooreNcaabHomeAdvantage float64 = 3.25
 
 // GetNflEventsByDate function
 func (interactor *EventsInteractor) GetNflEventsByDate(eventDate string) []domain.Event {
