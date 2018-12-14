@@ -120,13 +120,13 @@ func (scoreAPIRepo *ScoreAPIRepo) getEventsByDate(date string, getScheduleFn get
 			domainEvent := domain.Event{
 				ID: event.ID,
 				HomeTeam: domain.Team{
-					Name:    event.HomeTeam.MediumName,
+					Name:    event.HomeTeam.Name,
 					LogoURL: event.HomeTeam.Logos.Tiny,
 					Wins:    homeWins,
 					Loses:   homeLoses,
 				},
 				AwayTeam: domain.Team{
-					Name:    event.AwayTeam.MediumName,
+					Name:    event.AwayTeam.Name,
 					LogoURL: event.AwayTeam.Logos.Tiny,
 					Wins:    awayWins,
 					Loses:   awayLoses,

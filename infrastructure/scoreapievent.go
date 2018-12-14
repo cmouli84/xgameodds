@@ -139,6 +139,7 @@ type Team struct {
 	} `json:"logos"`
 	MediumName        string `json:"medium_name"`
 	ShortName         string `json:"short_name"`
+	Name              string `json:"name"`
 	Conference        string `json:"conference"`
 	HasInjuries       bool   `json:"has_injuries"`
 	HasRosters        bool   `json:"has_rosters"`
