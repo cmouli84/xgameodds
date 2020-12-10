@@ -1,4 +1,4 @@
-FROM golang:1.10
+FROM golang:1.15
 
 RUN go get -u github.com/cmouli84/xgameodds
 RUN go build github.com/cmouli84/xgameodds
